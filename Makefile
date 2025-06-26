@@ -14,6 +14,7 @@ Disk.img: BootLoader Kernel32
 
 clean:
 	make -C 00.BootLoader clean
+	make -C 01.Kernel32 clean
 	rm -f Disk.img
 
 re:
