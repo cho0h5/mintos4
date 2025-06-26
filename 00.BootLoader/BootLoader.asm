@@ -5,11 +5,18 @@ SECTION .text
 
 jmp 0x07c0:START
 
+TOTALSECTORCOUNT: dw 1024
+
 START:
     mov ax, 0x07c0
     mov ds, ax
     mov ax, 0xb800
     mov es, ax
+
+    mov ax, 0x0000
+    mov ss, ax
+    mov sp, 0xfffe
+    mov bp, 0xfffe
 
     mov si, 0
 
@@ -22,9 +29,6 @@ START:
     cmp si, 80 * 25 * 2
 
     jl .SCREENCLEARLOOP
-
-    mov si, 0
-    mov di, 0
 
     push MESSAGE1
     push 0
@@ -153,8 +157,6 @@ MESSAGE1: db 'Boot Loader Start', 0
 DISKERRORMESSAGE: db 'Disk Load Error', 0
 IMAGELOADINGMESSAGE: db 'Disk Loading...', 0
 LOADINGCOMPLETEMESSAGE: db 'Disk Load Complete', 0
-
-TOTALSECTORCOUNT: dw 1024
 
 SECTORNUMBER: db 0x02
 HEADNUMBER: db 0x00
