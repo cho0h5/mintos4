@@ -1,3 +1,4 @@
 Disk.img
 *.o
 *.swp
+*.bin
