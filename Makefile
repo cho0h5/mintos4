@@ -16,7 +16,7 @@ re:
 	make clean
 	make all
 
-run: all
+run: re
 	qemu-system-x86_64 \
 		-L . -m 64 -M pc \
 		-drive format=raw,file=Disk.img \
