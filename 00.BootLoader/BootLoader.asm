@@ -26,21 +26,19 @@ START:
     mov si, 0
     mov di, 0
 
-.MESSAGELOOP:
-    mov cl, byte [si + MESSAGE1]
-
-    cmp cl, 0
-    je .MESSAGEEND
-
-    mov byte [es: di], cl
-
-    add si, 1
-    add di, 2
-
-    jmp .MESSAGELOOP
-.MESSAGEEND:
+    push MESSAGE1
+    push 0
+    push 0
+    call PRINTMESSAGE
+    add sp, 6
 
 RESETDISK:
+    push IMAGELOADINGMESSAGE
+    push 1
+    push 0
+    call PRINTMESSAGE
+    add sp, 6
+
     mov ax, 0
     mov dl, 0
     int 0x13
@@ -85,25 +83,76 @@ READDATA:
     add byte [TRACKNUMBER], 0x01
     jmp READDATA
 READEND:
-;    push LOADINGCOMPLETEMESSAGE
-;    push 1
-;    push 20
-;    call PRINTMESSAGE
-;    add sp, 6
+    push LOADINGCOMPLETEMESSAGE
+    push 1
+    push 20
+    call PRINTMESSAGE
+    add sp, 6
 
     jmp 0x1000:0x0000
 
 HANDLEDISKERROR:
-;    push DISKERRORMESSAGE
-;    push 1
-;    push 20
-;    call PRINTMESSAGE
+    push DISKERRORMESSAGE
+    push 1
+    push 20
+    call PRINTMESSAGE
 
     jmp $
 
-jmp $
+PRINTMESSAGE:
+    push bp
+    mov bp, sp
 
-MESSAGE1: db 'Boot Loader Start', 0;
+    push es
+    push si
+    push di
+    push ax
+    push cx
+    push dx
+
+    mov ax, 0xb800
+    mov es, ax
+
+    mov ax, word [bp + 6]
+    mov si, 160
+    mul si
+    mov di, ax
+
+    mov ax, word [bp + 4]
+    mov si, 2
+    mul si
+    add di, ax
+
+    mov si, word [bp + 8]
+
+.MESSAGELOOP
+    mov cl, byte [si]
+
+    cmp cl, 0
+    je .MESSAGEEND
+
+    mov byte [es: di], cl
+
+    add si, 1
+    add di, 2
+
+    jmp .MESSAGELOOP
+
+.MESSAGEEND:
+    pop dx
+    pop cx
+    pop ax
+    pop di
+    pop si
+    pop es
+    pop bp
+    ret
+
+MESSAGE1: db 'Boot Loader Start', 0
+
+DISKERRORMESSAGE: db 'Disk Load Error', 0
+IMAGELOADINGMESSAGE: db 'Disk Loading...', 0
+LOADINGCOMPLETEMESSAGE: db 'Disk Load Complete', 0
 
 TOTALSECTORCOUNT: dw 1024
 
