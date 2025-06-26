@@ -1,12 +1,16 @@
 all:
 	make BootLoader
+	make Kernel32
 	make Disk.img
 
 BootLoader:
 	make -C 00.BootLoader
 
-Disk.img:
-	cp 00.BootLoader/BootLoader.bin Disk.img
+Kernel32:
+	make -C 01.Kernel32
+
+Disk.img: BootLoader Kernel32
+	cat 00.BootLoader/BootLoader.bin 01.Kernel32/VirtualOS.bin > Disk.img
 
 clean:
 	make -C 00.BootLoader clean
