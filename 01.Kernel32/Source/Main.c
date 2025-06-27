@@ -2,14 +2,24 @@
 
 void kPrintString(const int iX, const int iY, const char *pcString);
 BOOL kInitializeKernel64Area();
+BOOL kIsMemoryEnough();
 
 void Main() {
-    kPrintString(0, 3, "C Lang Kernel Started");
+    kPrintString(0, 3, "[Pass] C Lang Kernel Started");
 
+    kPrintString(0, 4, "[    ] IA-32e Kernel Area Initialization");
     if(kInitializeKernel64Area()) {
-        kPrintString(0, 4, "IA-32e Kernel Area Initialization Complete");
+        kPrintString(1, 4, "Pass");
     } else {
-        kPrintString(0, 4, "IA-32e Kernel Area Initialization Fail");
+        kPrintString(1, 4, "Fail");
+        while (1) ;
+    }
+
+    kPrintString(0, 5, "[    ] Minimum Memory Size Check");
+    if(kIsMemoryEnough()) {
+        kPrintString(1, 5, "Pass");
+    } else {
+        kPrintString(1, 5, "Fail");
         while (1) ;
     }
 
@@ -36,6 +46,21 @@ BOOL kInitializeKernel64Area() {
         }
 
         pdwCurrentAddress++;
+    }
+
+    return TRUE;
+}
+
+BOOL kIsMemoryEnough() {
+    DWORD *pdwCurrentAddress = (DWORD *)0x100000;
+
+    while (pdwCurrentAddress < 0x4000000) {
+        *pdwCurrentAddress = 0x12345678;
+        if (*pdwCurrentAddress != 0x12345678) {
+            return FALSE;
+        }
+
+        pdwCurrentAddress += (0x100000 / 4);
     }
 
     return TRUE;
