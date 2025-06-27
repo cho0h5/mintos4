@@ -129,7 +129,7 @@ PRINTMESSAGE:
 
     mov si, word [bp + 8]
 
-.MESSAGELOOP
+.MESSAGELOOP:
     mov cl, byte [si]
 
     cmp cl, 0
