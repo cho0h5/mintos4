@@ -10,7 +10,7 @@ Kernel32:
 	make -C 01.Kernel32
 
 Disk.img: BootLoader Kernel32
-	cat 00.BootLoader/BootLoader.bin 01.Kernel32/VirtualOS.bin > Disk.img
+	cat 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin > Disk.img
 
 clean:
 	make -C 00.BootLoader clean
