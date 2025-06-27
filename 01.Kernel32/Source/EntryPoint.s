@@ -63,7 +63,7 @@ PRINTMESSAGE:
     mov cl, byte [esi]
 
     cmp cl, 0
-    je .MESSAGELOOP
+    je .MESSAGEEND
 
     mov byte [edi + 0xb8000], cl
 
