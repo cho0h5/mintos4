@@ -1,4 +1,5 @@
 #include "Types.h"
+#include "Page.h"
 
 void kPrintString(const int iX, const int iY, const char *pcString);
 BOOL kInitializeKernel64Area();
@@ -23,6 +24,10 @@ void Main() {
         while (1) ;
     }
 
+    kPrintString(0, 6, "[    ] IA-32e Page Tables Initialize");
+    kInitializePageTables();
+    kPrintString(1, 6, "Pass");
+
     while (1) ;
 }
 
@@ -38,7 +43,7 @@ void kPrintString(const int iX, const int iY, const char *pcString) {
 BOOL kInitializeKernel64Area() {
     DWORD *pdwCurrentAddress = (DWORD *)0x100000;
 
-    while (pdwCurrentAddress < 0x600000) {
+    while (pdwCurrentAddress < (DWORD *)0x600000) {
         *pdwCurrentAddress = 0x00;
 
         if (*pdwCurrentAddress != 0) {
@@ -54,7 +59,7 @@ BOOL kInitializeKernel64Area() {
 BOOL kIsMemoryEnough() {
     DWORD *pdwCurrentAddress = (DWORD *)0x100000;
 
-    while (pdwCurrentAddress < 0x4000000) {
+    while (pdwCurrentAddress < (DWORD *)0x4000000) {
         *pdwCurrentAddress = 0x12345678;
         if (*pdwCurrentAddress != 0x12345678) {
             return FALSE;
