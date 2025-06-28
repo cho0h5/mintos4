@@ -1,10 +1,35 @@
 #include "Types.h"
+#include "Keyboard.h"
 
 void kPrintString(const int iX, const int iY, const char *pcString);
 
 void Main() {
     kPrintString(1, 10, "Pass");
     kPrintString(0, 11, "[Pass] IA-32e C Language Kernel Start");
+
+    kPrintString(0, 12, "[    ] Keyboard Activate");
+
+    if (kActivateKeyboard()) {
+        kPrintString(1, 12, "Pass");
+    } else {
+        kPrintString(1, 12, "Fail");
+        while (1) ;
+    }
+
+    int i = 0;
+    while (1) {
+        if (kIsOutputBufferFull()) {
+            const BYTE bTemp = kGetKeyboardScanCode();
+
+            char vcTemp[2] = { 0, };
+            BYTE bFlags;
+            if (kConvertScanCodeToASCIICode(bTemp, &vcTemp[0], &bFlags)) {
+                if (bFlags & KEY_FLAGS_DOWN) {
+                    kPrintString(i++, 12, vcTemp);
+                }
+            }
+        }
+    }
 }
 
 void kPrintString(const int iX, const int iY, const char *pcString) {
