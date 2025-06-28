@@ -41,6 +41,11 @@ void Main() {
             if (kConvertScanCodeToASCIICode(bTemp, &vcTemp[0], &bFlags)) {
                 if (bFlags & KEY_FLAGS_DOWN) {
                     kPrintString(i++, 16, vcTemp);
+
+                    if (vcTemp[0] == '0') {
+                        int tmp = 0;
+                        tmp = 1 / tmp;
+                    }
                 }
             }
         }
