@@ -3,6 +3,7 @@
 
 #include "Types.h"
 
+// GDT
 #define GDT_TYPE_CODE               0x0a
 #define GDT_TYPE_DATA               0x02
 #define GDT_TYPE_TSS                0x09
@@ -30,6 +31,21 @@
 #define GDT_MAXENTRY16COUNT         1
 #define GDT_TABLESIZE               sizeof(GDTENTRY8) * GDT_MAXENTRY8COUNT + sizeof(GDTENTRY16) * GDT_MAXENTRY16COUNT
 
+// IDT
+#define IDT_TYPE_INTERRUPT          0x0e
+#define IDT_TYPE_TRAP               0x0f
+#define IDT_FLAGS_DPL0              0x00
+#define IDT_FLAGS_DPL1              0x20
+#define IDT_FLAGS_DPL2              0x40
+#define IDT_FLAGS_DPL3              0x60
+#define IDT_FLAGS_P                 0x80
+#define IDT_FLAGS_IST0              0
+#define IDT_FLAGS_IST1              1
+
+#define IDT_FLAGS_KERNEL            (IDT_FLAGS_DPL0 | IDT_FLAGS_P)
+#define IDT_FLAGS_USER              (IDT_FLAGS_DPL3 | IDT_FLAGS_P)
+
+// IST
 #define IST_STARTADDRESS            0x700000
 #define IST_SIZE                    0x100000
 
@@ -72,13 +88,31 @@ typedef struct kTSSDataStruct {
     WORD wIOMapBaseAddress;
 } TSSSEGMENT;
 
+typedef struct kIDTEntryStruct {
+    WORD wLowerBaseAddress;
+    WORD wSegmentSelector;
+    BYTE bIST;
+    BYTE bTypeAndFlags;
+    WORD wMiddleBaseAddress;
+    DWORD dwUpperBaseAddress;
+    DWORD dwReserved;
+} IDTENTRY;
+
 #pragma pack(pop)
 
+// GDT
 void kInitializeGDTTableAndTSS();
 void kSetGDTEntry8(GDTENTRY8 *pstEntry, DWORD dwBaseAddress, DWORD dwLimit,
         BYTE bUpperFlags, BYTE bLowerFlags, BYTE bType);
 void kSetGDTEntry16(GDTENTRY16 *pstEntry, QWORD qwBaseAddress, DWORD dwLimit,
         BYTE bUpperFlags, BYTE bLowerFlags, BYTE bType);
+
+// TSS
 void kInitializeTSSSegment(TSSSEGMENT *pstTSS);
+
+// IDT
+void kInitializeIDTTables();
+void kSetIDTEntry(IDTENTRY *pstEntry, void *pvHandler, WORD wSelector, BYTE bIST, BYTE bFlags, BYTE bType);
+void kDummyHandler();
 
 #endif

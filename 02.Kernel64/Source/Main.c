@@ -22,6 +22,9 @@ void Main() {
     kLoadGDTR(0x142000);
     kLoadTR(0x18);
 
+    kInitializeIDTTables();
+    kLoadIDTR(0x1420a0);
+
     int i = 0;
     while (1) {
         if (kIsOutputBufferFull()) {

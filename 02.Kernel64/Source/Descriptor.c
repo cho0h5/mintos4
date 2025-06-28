@@ -2,6 +2,8 @@
 #include "Descriptor.h"
 #include "Utility.h"
 
+// GDT
+
 void kInitializeGDTTableAndTSS() {
     // GDTR
     GDTR *pstGDTR = (GDTR *)0x142000;
@@ -52,4 +54,45 @@ void kInitializeTSSSegment(TSSSEGMENT *pstTSS) {
     kMemSet(pstTSS, 0, sizeof(TSSSEGMENT));
     pstTSS->qwIST[0] = IST_STARTADDRESS + IST_SIZE;
     pstTSS->wIOMapBaseAddress = 0xffff;
+}
+
+// IDT
+
+void kInitializeIDTTables() {
+    IDTR *pstIDTR = (IDTR *)0x1420a0;
+    IDTENTRY *pstEntry = (IDTENTRY *)(0x1420a0 + sizeof(IDTR));
+    pstIDTR->qwBaseAddress = (QWORD)pstEntry;
+    pstIDTR->wLimit = 100 * sizeof(IDTENTRY) - 1;
+
+    for (int i = 0; i < 100; i++) {
+        kSetIDTEntry(&pstEntry[i], kDummyHandler, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    }
+}
+
+void kSetIDTEntry(IDTENTRY *pstEntry, void *pvHandler, WORD wSelector, BYTE bIST, BYTE bFlags, BYTE bType) {
+    pstEntry->wLowerBaseAddress = (QWORD)pvHandler & 0xffff;
+    pstEntry->wSegmentSelector = wSelector;
+    pstEntry->bIST = bIST & 0x3;
+    pstEntry->bTypeAndFlags = bType | bFlags;
+    pstEntry->wMiddleBaseAddress = ((QWORD)pvHandler >> 16) & 0xffff;
+    pstEntry->dwUpperBaseAddress = (QWORD)pvHandler >> 32;
+    pstEntry->dwReserved = 0;
+}
+
+static void kPrintString(const int iX, const int iY, const char *pcString) {
+    CHARACTER *pstScreen = (CHARACTER *)0xb8000;
+
+    pstScreen += (iY * 80) + iX;
+    for (int i = 0; pcString[i] != '\0'; i++) {
+        pstScreen[i].bCharactor = pcString[i];
+    }
+}
+
+void kDummyHandler() {
+    kPrintString(0, 0, "========================================");
+    kPrintString(0, 1, "     Dummy Interrupt Handler Called     ");
+    kPrintString(0, 2, "            Interrupt Occur             ");
+    kPrintString(0, 3, "========================================");
+
+    while (1) ;
 }
