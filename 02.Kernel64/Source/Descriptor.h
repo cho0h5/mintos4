@@ -27,9 +27,13 @@
 #define GDT_FLAGS_UPPER_DATA        (GDT_FLAGS_UPPER_G | GDT_FLAGS_UPPER_L)
 #define GDT_FLAGS_UPPER_TSS         (GDT_FLAGS_UPPER_G)
 
+#define GDT_TSSSEGMENT              0x18
+
+#define GDTR_STARTADDRESS           0x142000
 #define GDT_MAXENTRY8COUNT          3
 #define GDT_MAXENTRY16COUNT         1
 #define GDT_TABLESIZE               sizeof(GDTENTRY8) * GDT_MAXENTRY8COUNT + sizeof(GDTENTRY16) * GDT_MAXENTRY16COUNT
+#define TSS_SEGMENTSIZE             (sizeof(TSSSEGMENT))
 
 // IDT
 #define IDT_TYPE_INTERRUPT          0x0e
@@ -44,6 +48,8 @@
 
 #define IDT_FLAGS_KERNEL            (IDT_FLAGS_DPL0 | IDT_FLAGS_P)
 #define IDT_FLAGS_USER              (IDT_FLAGS_DPL3 | IDT_FLAGS_P)
+
+#define IDTR_STARTADDRESS           (GDTR_STARTADDRESS + sizeof(GDTR) + GDT_TABLESIZE + TSS_SEGMENTSIZE)
 
 // IST
 #define IST_STARTADDRESS            0x700000

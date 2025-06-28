@@ -9,21 +9,27 @@ void Main() {
     kPrintString(1, 10, "Pass");
     kPrintString(0, 11, "[Pass] IA-32e C Language Kernel Start");
 
-    kPrintString(0, 12, "[    ] Keyboard Activate");
+    kPrintString(0, 12, "[    ] GDT Initialize And Switch For IA-32e Mode");
+    kInitializeGDTTableAndTSS();
+    kLoadGDTR(GDTR_STARTADDRESS);
+    kPrintString(1, 12, "Pass");
 
+    kPrintString(0, 13, "[    ] TSS Segment Load");
+    kLoadTR(GDT_TSSSEGMENT);
+    kPrintString(1, 13, "Pass");
+
+    kPrintString(0, 14, "[    ] IDT Initialize");
+    kInitializeIDTTables();
+    kLoadIDTR(IDTR_STARTADDRESS);
+    kPrintString(1, 14, "Pass");
+
+    kPrintString(0, 15, "[    ] Keyboard Activate");
     if (kActivateKeyboard()) {
-        kPrintString(1, 12, "Pass");
+        kPrintString(1, 15, "Pass");
     } else {
-        kPrintString(1, 12, "Fail");
+        kPrintString(1, 15, "Fail");
         while (1) ;
     }
-
-    kInitializeGDTTableAndTSS();
-    kLoadGDTR(0x142000);
-    kLoadTR(0x18);
-
-    kInitializeIDTTables();
-    kLoadIDTR(0x1420a0);
 
     int i = 0;
     while (1) {
@@ -34,7 +40,7 @@ void Main() {
             BYTE bFlags;
             if (kConvertScanCodeToASCIICode(bTemp, &vcTemp[0], &bFlags)) {
                 if (bFlags & KEY_FLAGS_DOWN) {
-                    kPrintString(i++, 13, vcTemp);
+                    kPrintString(i++, 16, vcTemp);
                 }
             }
         }
