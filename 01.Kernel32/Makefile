@@ -53,6 +53,6 @@ Kernel32.elf: $(CENTRYPOINTOBJECTFILE) $(COBJECTFILES) $(ASSEMBLYOBJECTFILES)
 	$(LD32) -o $@ $^
 
 ifeq (Dependency.dep, $(wildcard Dependency.dep))
-	include Dependency.dep
+include Dependency.dep
 endif
 
