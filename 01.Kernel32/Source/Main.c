@@ -10,16 +10,16 @@ void kCopyKernel64ImageTo2Mbyte();
 void Main() {
     kPrintString(0, 3, "[Pass] C Lang Kernel Started");
 
-    kPrintString(0, 4, "[    ] IA-32e Kernel Area Initialization");
-    if(kInitializeKernel64Area()) {
+    kPrintString(0, 4, "[    ] Minimum Memory Size Check");
+    if(kIsMemoryEnough()) {
         kPrintString(1, 4, "Pass");
     } else {
         kPrintString(1, 4, "Fail");
         while (1) ;
     }
 
-    kPrintString(0, 5, "[    ] Minimum Memory Size Check");
-    if(kIsMemoryEnough()) {
+    kPrintString(0, 5, "[    ] IA-32e Kernel Area Initialize");
+    if(kInitializeKernel64Area()) {
         kPrintString(1, 5, "Pass");
     } else {
         kPrintString(1, 5, "Fail");
@@ -52,7 +52,7 @@ void Main() {
     kCopyKernel64ImageTo2Mbyte();
     kPrintString(1, 9, "Pass");
 
-    kPrintString(0, 10, "[   ] Switch To IA-32e Mode");
+    kPrintString(0, 10, "[    ] Switch To IA-32e Mode");
     kSwitchAndExecute64bitKernel();
 
     while (1) ;
