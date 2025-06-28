@@ -1,5 +1,7 @@
 #include "Types.h"
 #include "Keyboard.h"
+#include "Descriptor.h"
+#include "AssemblyUtility.h"
 
 void kPrintString(const int iX, const int iY, const char *pcString);
 
@@ -15,6 +17,10 @@ void Main() {
         kPrintString(1, 12, "Fail");
         while (1) ;
     }
+
+    kInitializeGDTTableAndTSS();
+    kLoadGDTR(0x142000);
+    kLoadTR(0x18);
 
     int i = 0;
     while (1) {
