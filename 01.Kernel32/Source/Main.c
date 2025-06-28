@@ -1,5 +1,6 @@
 #include "Types.h"
 #include "Page.h"
+#include "ModeSwitch.h"
 
 void kPrintString(const int iX, const int iY, const char *pcString);
 BOOL kInitializeKernel64Area();
@@ -27,6 +28,27 @@ void Main() {
     kPrintString(0, 6, "[    ] IA-32e Page Tables Initialize");
     kInitializePageTables();
     kPrintString(1, 6, "Pass");
+
+    DWORD dwEAX, dwEBX, dwECX, dwEDX;
+    char vcVendorString[13] = { 0, };
+    kReadCPUID(0x00, &dwEAX, &dwEBX, &dwECX, &dwEDX);
+    *(DWORD *)vcVendorString = dwEBX;
+    *((DWORD *)vcVendorString + 1) = dwEDX;
+    *((DWORD *)vcVendorString + 2) = dwECX;
+    kPrintString(0, 7, "[            ] Processor Vendor String");
+    kPrintString(1, 7, vcVendorString);
+
+    kReadCPUID(0x80000001, &dwEAX, &dwEBX, &dwECX, &dwEDX);
+    kPrintString(0, 8, "[    ] 64bits Mode Support Check");
+    if (dwEDX & (1 << 29)) {
+        kPrintString(1, 8, "Pass");
+    } else {
+        kPrintString(1, 8, "Fail");
+        while (1) ;
+    }
+
+    kPrintString(0, 9, "Switch To IA-32e Mode");
+    // kSwitchAndExecute64bitKernel();
 
     while (1) ;
 }
