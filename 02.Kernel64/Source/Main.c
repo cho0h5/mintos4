@@ -25,7 +25,7 @@ void Main() {
             BYTE bFlags;
             if (kConvertScanCodeToASCIICode(bTemp, &vcTemp[0], &bFlags)) {
                 if (bFlags & KEY_FLAGS_DOWN) {
-                    kPrintString(i++, 12, vcTemp);
+                    kPrintString(i++, 13, vcTemp);
                 }
             }
         }
