@@ -4,7 +4,7 @@ void kPrintString(const int iX, const int iY, const char *pcString);
 
 void Main() {
     kPrintString(1, 10, "Pass");
-    kPrintString(0, 11, "IA-32e C Language Kernel Start");
+    kPrintString(0, 11, "[Pass] IA-32e C Language Kernel Start");
 }
 
 void kPrintString(const int iX, const int iY, const char *pcString) {
