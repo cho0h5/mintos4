@@ -244,7 +244,7 @@ BOOL kConvertScanCodeToASCIICode(const BYTE bScanCode, BYTE *pbASCIICode, BOOL *
         *pbFlags = 0;
     }
 
-    if (bScanCode & 0x80 == 0) {
+    if ((bScanCode & 0x80) == 0) {
         *pbFlags |= KEY_FLAGS_DOWN;
     }
 
