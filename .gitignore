@@ -4,3 +4,4 @@ Disk.img
 *.bin
 *.elf
 ImageMaker
+*.dep
