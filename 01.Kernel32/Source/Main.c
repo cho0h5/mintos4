@@ -5,6 +5,7 @@
 void kPrintString(const int iX, const int iY, const char *pcString);
 BOOL kInitializeKernel64Area();
 BOOL kIsMemoryEnough();
+void kCopyKernel64ImageTo2Mbyte();
 
 void Main() {
     kPrintString(0, 3, "[Pass] C Lang Kernel Started");
@@ -47,8 +48,12 @@ void Main() {
         while (1) ;
     }
 
-    kPrintString(0, 9, "[   ] Switch To IA-32e Mode");
-    // kSwitchAndExecute64bitKernel();
+    kPrintString(0, 9, "[    ] Copy IA-32e Kernel to 2M Address");
+    kCopyKernel64ImageTo2Mbyte();
+    kPrintString(1, 9, "Pass");
+
+    kPrintString(0, 10, "[   ] Switch To IA-32e Mode");
+    kSwitchAndExecute64bitKernel();
 
     while (1) ;
 }
@@ -91,4 +96,17 @@ BOOL kIsMemoryEnough() {
     }
 
     return TRUE;
+}
+
+void kCopyKernel64ImageTo2Mbyte() {
+    const WORD wTotalKernelSectorCount = *((WORD *)0x7c05);
+    const WORD wKernel32SectorCount = *((WORD *)0x7c07);
+
+    DWORD *pdwSourceAddress = (DWORD *)(0x10000 + wKernel32SectorCount * 512);
+    DWORD *pdwDestinationAddress = (DWORD *)0x200000;
+    for (int i = 0; i < 512 * (wTotalKernelSectorCount - wKernel32SectorCount) / 4; i++) {
+        *pdwDestinationAddress = *pdwSourceAddress;
+        pdwSourceAddress++;
+        pdwDestinationAddress++;
+    }
 }
