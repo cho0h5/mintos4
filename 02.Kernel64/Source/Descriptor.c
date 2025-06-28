@@ -1,7 +1,6 @@
 #include "Types.h"
 #include "Descriptor.h"
 #include "Utility.h"
-#include "AssemblyUtility.h"
 
 void kInitializeGDTTableAndTSS() {
     // GDTR
@@ -51,6 +50,6 @@ void kSetGDTEntry16(GDTENTRY16 *pstEntry, QWORD qwBaseAddress, DWORD dwLimit,
 
 void kInitializeTSSSegment(TSSSEGMENT *pstTSS) {
     kMemSet(pstTSS, 0, sizeof(TSSSEGMENT));
-    pstTSS->qwIST[0] = 0x800000;
+    pstTSS->qwIST[0] = IST_STARTADDRESS + IST_SIZE;
     pstTSS->wIOMapBaseAddress = 0xffff;
 }
