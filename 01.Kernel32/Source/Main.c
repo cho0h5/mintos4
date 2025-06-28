@@ -47,7 +47,7 @@ void Main() {
         while (1) ;
     }
 
-    kPrintString(0, 9, "Switch To IA-32e Mode");
+    kPrintString(0, 9, "[   ] Switch To IA-32e Mode");
     // kSwitchAndExecute64bitKernel();
 
     while (1) ;
