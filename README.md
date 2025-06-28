@@ -22,3 +22,5 @@ NASM version 2.16.03 compiled on May 13 2025
 - ch08. QEMU에서는 A20 Gate 활성화가 필요하지 않음
 - ch11. Keyboard LED 구현 안함
 - ch11. Keyboard A20 구현 안함
+- ch11. QEMU -graphic curses에서는 SHIFT를 눌러도 scan code가 가지 않음
+    - SHIFT를 누른 체로 다른 키도 눌러야 그 때 연속해서 scan code가 인식됨
