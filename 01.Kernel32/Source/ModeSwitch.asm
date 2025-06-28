@@ -50,8 +50,8 @@ kSwitchAndExecute64bitKernel:
     wrmsr
 
     mov eax, cr0
-    or eax, 0xe000000
-    xor eax, 0x6000000
+    or eax, 0xe0000000
+    xor eax, 0x60000000
     mov cr0, eax
 
     jmp 0x08:0x200000
