@@ -101,9 +101,9 @@ int kGetNextParameter(PARAMETERLIST *pstList, char *pcParameter) {
 }
 
 void kHelp(const char *pcParameterBuffer) {
-    kPrintf(0, 0, "========================================");
-    kPrintf(0, 1, "           MINT64 Shell Help            ");
-    kPrintf(0, 2, "========================================");
+    kPrintf("========================================\n");
+    kPrintf("           MINT64 Shell Help            \n");
+    kPrintf("========================================\n");
 
     const int iCount = sizeof(gs_vstCommandTable) / sizeof(SHELLCOMMANENTRY);
 
