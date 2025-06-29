@@ -62,6 +62,31 @@ BOOL kSetInterruptFlag(BOOL bEnableInterrupt) {
     return FALSE;
 }
 
+static QWORD gs_qwTotalRAMMBSize = 0;
+
+void kCheckTotalRAMSize() {
+    DWORD *pdwCurrentAddress = (DWORD *)0x4000000;
+    DWORD dwPreviousValue;
+
+    while (1) {
+        dwPreviousValue = *pdwCurrentAddress;
+
+        *pdwCurrentAddress = 0x12345678;
+        if (*pdwCurrentAddress != 0x12345678) {
+            break;
+        }
+
+        *pdwCurrentAddress = dwPreviousValue;
+        pdwCurrentAddress += 0x400000 / 4;
+    }
+
+    gs_qwTotalRAMMBSize = (QWORD)pdwCurrentAddress / 0x100000;
+}
+
+QWORD kGetTotalRAMSize() {
+    return gs_qwTotalRAMMBSize;
+}
+
 long kAToI(const char *pcBuffer, int iRadix) {
     long lReturn;
 

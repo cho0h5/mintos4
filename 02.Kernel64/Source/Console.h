@@ -54,6 +54,8 @@ void kSetCursor(const int iX, const int iY);
 void kGetCursor(int *piX, int *piY);
 void kPrintf(const char *pcFormatString, ...);
 int kConsolePrintString(const char *pcBuffer);
+void kClearScreen();
 BYTE kGetCh();
+void kPrintStringXY(int iX, int iY, const char *pcString);
 
 #endif

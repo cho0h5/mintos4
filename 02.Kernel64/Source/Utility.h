@@ -12,6 +12,9 @@ int kStrLen(const char *pcBuffer);
 void kPrintString(const int iX, const int iY, const char *pcString);
 BOOL kSetInterruptFlag(BOOL bEnableInterrupt);
 
+void kCheckTotalRAMSize();
+QWORD kGetTotalRAMSize();
+
 long kAToI(const char *pcBuffer, int iRadix);
 QWORD kHexStringToQword(const char *pcBuffer);
 long kDecimalStringToLong(const char *pcBuffer);

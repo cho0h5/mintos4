@@ -70,6 +70,17 @@ int kConsolePrintString(const char *pcBuffer) {
     return iPrintOffset;
 }
 
+void kClearScreen() {
+    CHARACTER *pstScreen = (CHARACTER *)CONSOLE_VIDEOMEMORYADDRESS;
+
+    for (int i = 0; i < CONSOLE_HEIGHT * CONSOLE_WIDTH; i++) {
+        pstScreen[i].bCharactor = ' ';
+        pstScreen[i].bAttribute = CONSOLE_DEFAULTTEXTCOLOR;
+    }
+
+    kSetCursor(0, 0);
+}
+
 BYTE kGetCh() {
     KEYDATA stData;
 
@@ -79,5 +90,15 @@ BYTE kGetCh() {
         if (stData.bFlags & KEY_FLAGS_DOWN) {
             return stData.bASCIICode;
         }
+    }
+}
+
+void kPrintStringXY(int iX, int iY, const char *pcString) {
+    CHARACTER *pstScreen = (CHARACTER *)CONSOLE_VIDEOMEMORYADDRESS;
+
+    pstScreen += iY * 80 + iX;
+    for (int i = 0; pcString[i]; i++) {
+        pstScreen[i].bCharactor = pcString[i];
+        pstScreen[i].bAttribute = CONSOLE_DEFAULTTEXTCOLOR;
     }
 }
