@@ -2,9 +2,9 @@
 #include "Keyboard.h"
 #include "Descriptor.h"
 #include "AssemblyUtility.h"
-#include "Utility.h"
 #include "PIC.h"
 #include "Console.h"
+#include "ConsoleShell.h"
 
 void Main() {
     kInitializeConsole(0, 10);
@@ -52,20 +52,5 @@ void Main() {
     kSetCursor(1, iCursorY++);
     kPrintf("Pass\n");
 
-    int i = 0;
-    while (1) {
-        KEYDATA stData;
-        if (kGetKeyFromKeyQueue(&stData)) {
-            char vcTemp[2] = { 0, };
-            if (stData.bFlags & KEY_FLAGS_DOWN) {
-                vcTemp[0] = stData.bASCIICode;
-                kPrintStringXY(i++, 17, vcTemp);
-
-                if (vcTemp[0] == '0') {
-                    int tmp = 0;
-                    tmp = 1 / tmp;
-                }
-            }
-        }
-    }
+    kStartConsoleShell();
 }
