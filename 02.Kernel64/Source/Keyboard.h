@@ -49,14 +49,14 @@
 #define KEY_F12                     0x9f
 #define KEY_PAUSE                   0xa0
 
+#define KEY_MAXQUEUECOUNT           100
+
 #pragma pack(push, 1)
 
 typedef struct kKeyMappingEntryStruct {
     BYTE bNormalCode;
     BYTE bCombinedCode;
 } KEYMAPPINGENTRY;
-
-#pragma pack(pop)
 
 typedef struct kKeyboardManagerStruct {
     BOOL bShiftdown;
@@ -66,6 +66,14 @@ typedef struct kKeyboardManagerStruct {
     BOOL bExtendedCodeIn;
     int iSkipCountForPause;
 } KEYBOARDMANAGER;
+
+typedef struct kKeyDataStruct {
+    BYTE bScanCode;
+    BYTE bASCIICode;
+    BYTE bFlags;
+} KEYDATA;
+
+#pragma pack(pop)
 
 BOOL kIsOutputBufferFull();
 BOOL kIsInputBufferFull();
@@ -78,5 +86,10 @@ BOOL kIsNumberPadScanCode(const BYTE bScanCode);
 BOOL kIsUseCombinedCode(const BYTE bScanCode);
 void UpdateCombinationKeyStatus(const BYTE bScanCode);
 BOOL kConvertScanCodeToASCIICode(const BYTE bScanCode, BYTE *pbASCIICode, BOOL *pbFlags);
+
+// For interrupt
+BOOL kInitializeKeyboard();
+BOOL kConvertScanCodeAndPutQueue(BYTE bScanCode);
+BOOL kGetKeyFromKeyQueue(KEYDATA *pstData);
 
 #endif

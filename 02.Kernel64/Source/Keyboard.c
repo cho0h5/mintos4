@@ -1,6 +1,7 @@
 #include "Types.h"
 #include "AssemblyUtility.h"
 #include "Keyboard.h"
+#include "Queue.h"
 
 BOOL kIsOutputBufferFull() {
     if (kInPortByte(0x64) & 0x01) {
@@ -62,6 +63,9 @@ void kReboot() {
 }
 
 static KEYBOARDMANAGER gs_stKeyboardManager = { 0, };
+
+static QUEUE gs_stKeyQueue;
+static KEYDATA gs_vstKeyQueueBuffer[KEY_MAXQUEUECOUNT];
 
 static KEYMAPPINGENTRY gs_vstKeyMappingTable[KEY_MAPPINGTABLEMAXCOUNT] = {
     {KEY_NONE,          KEY_NONE      },    /* 00 */
@@ -250,4 +254,29 @@ BOOL kConvertScanCodeToASCIICode(const BYTE bScanCode, BYTE *pbASCIICode, BOOL *
 
     UpdateCombinationKeyStatus(bScanCode);
     return TRUE;
+}
+
+BOOL kInitializeKeyboard() {
+    kInitializeQueue(&gs_stKeyQueue, gs_vstKeyQueueBuffer, KEY_MAXQUEUECOUNT, sizeof(KEYDATA));
+
+    return kActivateKeyboard();
+}
+
+BOOL kConvertScanCodeAndPutQueue(BYTE bScanCode) {
+    KEYDATA stData;
+    stData.bScanCode = bScanCode;
+
+    if (kConvertScanCodeToASCIICode(bScanCode, &stData.bASCIICode, &stData.bFlags)) {
+        return kPutQueue(&gs_stKeyQueue, &stData);
+    }
+
+    return FALSE;
+}
+
+BOOL kGetKeyFromKeyQueue(KEYDATA *pstData) {
+    if (kIsQueueEmpty(&gs_stKeyQueue)) {
+        return FALSE;
+    }
+
+    return kGetQueue(&gs_stKeyQueue, pstData);
 }

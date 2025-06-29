@@ -2,6 +2,7 @@
 #include "InterruptHandler.h"
 #include "PIC.h"
 #include "Utility.h"
+#include "Keyboard.h"
 
 void kCommonExceptionHandler(int iVectorNumber, QWORD qwErrorCode) {
     char vcBuffer[3] = { 0, };
@@ -22,13 +23,12 @@ void kCommonInterruptHandler(int iVectorNumber) {
     static int g_iCommonInterruptCount = 0;
     char vcBuffer[] = "[INT:  , ]";
 
+    // print
     vcBuffer[5] = '0' + iVectorNumber / 10;
     vcBuffer[6] = '0' + iVectorNumber % 10;
     vcBuffer[8] = '0' + g_iCommonInterruptCount;
-
     g_iCommonInterruptCount += 1;
     g_iCommonInterruptCount %= 10;
-
     kPrintString(70, 0, vcBuffer);
 
     kSendEOIToPIC(iVectorNumber - 32);
@@ -37,15 +37,20 @@ void kCommonInterruptHandler(int iVectorNumber) {
 void kKeyboardHandler(int iVectorNumber) {
     static int g_iKeyboardInterruptCount = 0;
     char vcBuffer[] = "[INT:  , ]";
+    BYTE bTemp;
 
+    // Print
     vcBuffer[5] = '0' + iVectorNumber / 10;
     vcBuffer[6] = '0' + iVectorNumber % 10;
     vcBuffer[8] = '0' + g_iKeyboardInterruptCount;
-
     g_iKeyboardInterruptCount += 1;
     g_iKeyboardInterruptCount %= 10;
-
     kPrintString(70, 1, vcBuffer);
+
+    if (kIsOutputBufferFull()) {
+        bTemp = kGetKeyboardScanCode();
+        kConvertScanCodeAndPutQueue(bTemp);
+    }
 
     kSendEOIToPIC(iVectorNumber - 32);
 }

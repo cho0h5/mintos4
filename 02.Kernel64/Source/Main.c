@@ -23,8 +23,8 @@ void Main() {
     kLoadIDTR(IDTR_STARTADDRESS);
     kPrintString(1, 14, "Pass");
 
-    kPrintString(0, 15, "[    ] Keyboard Activate");
-    if (kActivateKeyboard()) {
+    kPrintString(0, 15, "[    ] Keyboard Activate And Queue Initialize");
+    if (kInitializeKeyboard()) {
         kPrintString(1, 15, "Pass");
     } else {
         kPrintString(1, 15, "Fail");
@@ -39,19 +39,16 @@ void Main() {
 
     int i = 0;
     while (1) {
-        if (kIsOutputBufferFull()) {
-            const BYTE bTemp = kGetKeyboardScanCode();
-
+        KEYDATA stData;
+        if (kGetKeyFromKeyQueue(&stData)) {
             char vcTemp[2] = { 0, };
-            BYTE bFlags;
-            if (kConvertScanCodeToASCIICode(bTemp, &vcTemp[0], &bFlags)) {
-                if (bFlags & KEY_FLAGS_DOWN) {
-                    kPrintString(i++, 17, vcTemp);
+            if (stData.bFlags & KEY_FLAGS_DOWN) {
+                vcTemp[0] = stData.bASCIICode;
+                kPrintString(i++, 17, vcTemp);
 
-                    if (vcTemp[0] == '0') {
-                        int tmp = 0;
-                        tmp = 1 / tmp;
-                    }
+                if (vcTemp[0] == '0') {
+                    int tmp = 0;
+                    tmp = 1 / tmp;
                 }
             }
         }
