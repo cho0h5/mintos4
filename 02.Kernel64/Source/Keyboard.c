@@ -2,6 +2,8 @@
 #include "AssemblyUtility.h"
 #include "Keyboard.h"
 #include "Queue.h"
+#include "AssemblyUtility.h"
+#include "Utility.h"
 
 BOOL kIsOutputBufferFull() {
     if (kInPortByte(0x64) & 0x01) {
@@ -17,7 +19,32 @@ BOOL kIsInputBufferFull() {
     return FALSE;
 }
 
+BOOL kWaitForACKAndPutOtherScanCode() {
+    BOOL bResult = FALSE;
+
+    for (int j = 0; j < 100; j++) {
+        for (int i = 0; i < 0xffff; i++) {
+            if (kIsOutputBufferFull()) {
+                break;
+            }
+        }
+
+        BYTE bData = kInPortByte(0x60);
+        if (bData == 0xfa) {
+            bResult = TRUE;
+            break;
+        } else {
+            kConvertScanCodeAndPutQueue(bData);
+        }
+    }
+
+    return bResult;
+}
+
 BOOL kActivateKeyboard() {
+    // Disable interrupt
+    BOOL bPreviousInterrupt = kSetInterruptFlag(FALSE);
+
     // Activate a keyboard controller
     kOutPortByte(0x64, 0xae);
     for (int i = 0; i < 0xffff; i++) {
@@ -28,19 +55,13 @@ BOOL kActivateKeyboard() {
 
     // Activate a keyboard
     kOutPortByte(0x60, 0xf4);
-    for (int j = 0; j < 100; j++) {
-        for (int i = 0; i < 0xffff; i++) {
-            if (kIsOutputBufferFull() == TRUE) {
-                break;
-            }
-        }
 
-        if (kInPortByte(0x60) == 0xfa) {
-            return TRUE;
-        }
-    }
+    BOOL bResult = kWaitForACKAndPutOtherScanCode();
 
-    return FALSE;
+    // Restore interrupt
+    kSetInterruptFlag(bPreviousInterrupt);
+
+    return bResult;
 }
 
 BYTE kGetKeyboardScanCode() {
@@ -263,14 +284,22 @@ BOOL kInitializeKeyboard() {
 }
 
 BOOL kConvertScanCodeAndPutQueue(BYTE bScanCode) {
+    BOOL bResult = FALSE;
     KEYDATA stData;
     stData.bScanCode = bScanCode;
 
     if (kConvertScanCodeToASCIICode(bScanCode, &stData.bASCIICode, &stData.bFlags)) {
-        return kPutQueue(&gs_stKeyQueue, &stData);
+        // Disable interrupt
+        BOOL bPreviousInterrupt = kSetInterruptFlag(FALSE);
+
+        // Put to Queue
+        bResult = kPutQueue(&gs_stKeyQueue, &stData);
+
+        // Restore Interrupt
+        kSetInterruptFlag(bPreviousInterrupt);
     }
 
-    return FALSE;
+    return bResult;
 }
 
 BOOL kGetKeyFromKeyQueue(KEYDATA *pstData) {
@@ -278,5 +307,14 @@ BOOL kGetKeyFromKeyQueue(KEYDATA *pstData) {
         return FALSE;
     }
 
-    return kGetQueue(&gs_stKeyQueue, pstData);
+    // Disable interrupt
+    BOOL bPreviousInterrupt = kSetInterruptFlag(FALSE);
+
+    // Get from queue
+    BOOL bResult = kGetQueue(&gs_stKeyQueue, pstData);
+
+    // Restore Interrupt
+    kSetInterruptFlag(bPreviousInterrupt);
+
+    return bResult;
 }

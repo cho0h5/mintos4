@@ -91,5 +91,6 @@ BOOL kConvertScanCodeToASCIICode(const BYTE bScanCode, BYTE *pbASCIICode, BOOL *
 BOOL kInitializeKeyboard();
 BOOL kConvertScanCodeAndPutQueue(BYTE bScanCode);
 BOOL kGetKeyFromKeyQueue(KEYDATA *pstData);
+BOOL kWaitForACKAndPutOtherScanCode();
 
 #endif

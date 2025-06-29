@@ -3,6 +3,8 @@
 
 #include "Types.h"
 
+#pragma pack(push, 1)
+
 typedef struct kQueueManagerStruct {
     int iDataSize;
     int iMaxDataCount;
@@ -13,6 +15,8 @@ typedef struct kQueueManagerStruct {
 
     BOOL bLastOperationPut;
 } QUEUE;
+
+#pragma pack(pop)
 
 void kInitializeQueue(QUEUE *pstQueue, void *pvQueueBuffer, int iMaxDataCount, int iDataSize);
 BOOL kIsQueueFull(const QUEUE *pstQueue);
