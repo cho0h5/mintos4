@@ -5,6 +5,7 @@
 #include "PIC.h"
 #include "Console.h"
 #include "ConsoleShell.h"
+#include "Utility.h"
 
 void Main() {
     kInitializeConsole(0, 10);
@@ -32,6 +33,11 @@ void Main() {
     kPrintf("[    ] IDT Initialize\n");
     kInitializeIDTTables();
     kLoadIDTR(IDTR_STARTADDRESS);
+    kSetCursor(1, iCursorY++);
+    kPrintf("Pass\n");
+
+    kPrintf("[    ] Total RAM Size Check\n");
+    kCheckTotalRAMSize();
     kSetCursor(1, iCursorY++);
     kPrintf("Pass\n");
 
