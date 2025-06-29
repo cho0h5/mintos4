@@ -185,13 +185,13 @@ int kHexToString(QWORD qwValue, char *pcBuffer) {
     int i = 0;
     for (; qwValue > 0; i++) {
         QWORD qwCurrentValue = qwValue % 16;
-        if (qwValue >= 10) {
+        if (qwCurrentValue >= 10) {
             pcBuffer[i] = 'a' + (qwCurrentValue - 10);
         } else {
             pcBuffer[i] = '0' + qwCurrentValue;
         }
 
-        qwValue /= 16;
+        qwValue = qwValue / 16;
     }
 
     pcBuffer[i] = '\0';
