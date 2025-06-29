@@ -9,7 +9,6 @@ int kMemCpy(void *pvDestination, const void *pvSource, int iSize);
 int kMemCmp(const void *pvDestination, const void *pvSource, int iSize);
 int kStrLen(const char *pcBuffer);
 
-void kPrintString(const int iX, const int iY, const char *pcString);
 BOOL kSetInterruptFlag(BOOL bEnableInterrupt);
 
 void kCheckTotalRAMSize();

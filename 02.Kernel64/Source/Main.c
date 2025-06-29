@@ -4,38 +4,53 @@
 #include "AssemblyUtility.h"
 #include "Utility.h"
 #include "PIC.h"
+#include "Console.h"
 
 void Main() {
-    kPrintString(1, 10, "Pass");
-    kPrintString(0, 11, "[Pass] IA-32e C Language Kernel Start");
+    kInitializeConsole(0, 10);
 
-    kPrintString(0, 12, "[    ] GDT Initialize And Switch For IA-32e Mode");
+    int iCursorX, iCursorY;
+    kGetCursor(&iCursorX, &iCursorY);
+
+    kSetCursor(1, iCursorY++);
+    kPrintf("Pass\n");
+
+    kPrintf("[Pass] IA-32e C Language Kernel Start\n");
+    iCursorY++;
+
+    kPrintf("[    ] GDT Initialize And Switch For IA-32e Mode\n");
     kInitializeGDTTableAndTSS();
     kLoadGDTR(GDTR_STARTADDRESS);
-    kPrintString(1, 12, "Pass");
+    kSetCursor(1, iCursorY++);
+    kPrintf("Pass\n");
 
-    kPrintString(0, 13, "[    ] TSS Segment Load");
+    kPrintf("[    ] TSS Segment Load\n");
     kLoadTR(GDT_TSSSEGMENT);
-    kPrintString(1, 13, "Pass");
+    kSetCursor(1, iCursorY++);
+    kPrintf("Pass\n");
 
-    kPrintString(0, 14, "[    ] IDT Initialize");
+    kPrintf("[    ] IDT Initialize\n");
     kInitializeIDTTables();
     kLoadIDTR(IDTR_STARTADDRESS);
-    kPrintString(1, 14, "Pass");
+    kSetCursor(1, iCursorY++);
+    kPrintf("Pass\n");
 
-    kPrintString(0, 15, "[    ] Keyboard Activate And Queue Initialize");
+    kPrintf("[    ] Keyboard Activate And Queue Initialize\n");
     if (kInitializeKeyboard()) {
-        kPrintString(1, 15, "Pass");
+        kSetCursor(1, iCursorY++);
+        kPrintf("Pass\n");
     } else {
-        kPrintString(1, 15, "Fail");
+        kSetCursor(1, iCursorY++);
+        kPrintf("Fail\n");
         while (1) ;
     }
 
-    kPrintString(0, 16, "[    ] PIC Controller and Interrupt Initialize");
+    kPrintf("[    ] PIC Controller and Interrupt Initialize\n");
     kInitializePIC();
     kMaskPICInterrupt(0);
     kEnableInterrupt();
-    kPrintString(1, 16, "Pass");
+    kSetCursor(1, iCursorY++);
+    kPrintf("Pass\n");
 
     int i = 0;
     while (1) {
@@ -44,7 +59,7 @@ void Main() {
             char vcTemp[2] = { 0, };
             if (stData.bFlags & KEY_FLAGS_DOWN) {
                 vcTemp[0] = stData.bASCIICode;
-                kPrintString(i++, 17, vcTemp);
+                kPrintStringXY(i++, 17, vcTemp);
 
                 if (vcTemp[0] == '0') {
                     int tmp = 0;

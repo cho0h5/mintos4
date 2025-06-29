@@ -23,7 +23,7 @@ void kStartConsoleShell() {
             if (iCommandBufferIndex > 0) {
                 int iCursorX, iCursorY;
                 kGetCursor(&iCursorX, &iCursorY);
-                kPrintString(iCursorX - 1, iCursorY, " ");
+                kPrintStringXY(iCursorX - 1, iCursorY, " ");
                 kSetCursor(iCursorX - 1, iCursorY);
                 iCommandBufferIndex--;
             }

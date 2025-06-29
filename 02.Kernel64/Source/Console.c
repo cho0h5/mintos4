@@ -6,6 +6,11 @@
 
 CONSOLEMANAGER gs_stConsoleManager = { 0, };
 
+void kInitializeConsole(int iX, int iY) {
+    kMemSet(&gs_stConsoleManager, 0, sizeof(gs_stConsoleManager));
+    kSetCursor(iX, iY);
+}
+
 void kSetCursor(const int iX, const int iY) {
     const int iLinearValue = iY * CONSOLE_WIDTH + iX;
 

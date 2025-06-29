@@ -1,8 +1,8 @@
 #include "Types.h"
 #include "InterruptHandler.h"
 #include "PIC.h"
-#include "Utility.h"
 #include "Keyboard.h"
+#include "Console.h"
 
 void kCommonExceptionHandler(int iVectorNumber, QWORD qwErrorCode) {
     char vcBuffer[3] = { 0, };
@@ -10,11 +10,11 @@ void kCommonExceptionHandler(int iVectorNumber, QWORD qwErrorCode) {
     vcBuffer[0] = '0' + iVectorNumber / 10;
     vcBuffer[1] = '0' + iVectorNumber % 10;
 
-    kPrintString(0, 0, "========================================");
-    kPrintString(0, 1, "            Interrupt Occur             ");
-    kPrintString(0, 2, "              Vector:                   ");
-    kPrintString(0, 3, "========================================");
-    kPrintString(22, 2, vcBuffer);
+    kPrintStringXY(0, 0, "========================================");
+    kPrintStringXY(0, 1, "            Interrupt Occur             ");
+    kPrintStringXY(0, 2, "              Vector:                   ");
+    kPrintStringXY(0, 3, "========================================");
+    kPrintStringXY(22, 2, vcBuffer);
 
     while (1) ;
 }
@@ -29,7 +29,7 @@ void kCommonInterruptHandler(int iVectorNumber) {
     vcBuffer[8] = '0' + g_iCommonInterruptCount;
     g_iCommonInterruptCount += 1;
     g_iCommonInterruptCount %= 10;
-    kPrintString(70, 0, vcBuffer);
+    kPrintStringXY(70, 0, vcBuffer);
 
     kSendEOIToPIC(iVectorNumber - 32);
 }
@@ -45,7 +45,7 @@ void kKeyboardHandler(int iVectorNumber) {
     vcBuffer[8] = '0' + g_iKeyboardInterruptCount;
     g_iKeyboardInterruptCount += 1;
     g_iKeyboardInterruptCount %= 10;
-    kPrintString(70, 1, vcBuffer);
+    kPrintStringXY(70, 1, vcBuffer);
 
     if (kIsOutputBufferFull()) {
         bTemp = kGetKeyboardScanCode();
