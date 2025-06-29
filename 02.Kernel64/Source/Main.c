@@ -3,6 +3,7 @@
 #include "Descriptor.h"
 #include "AssemblyUtility.h"
 #include "Utility.h"
+#include "PIC.h"
 
 void Main() {
     kPrintString(1, 10, "Pass");
@@ -30,6 +31,12 @@ void Main() {
         while (1) ;
     }
 
+    kPrintString(0, 16, "[    ] PIC Controller and Interrupt Initialize");
+    kInitializePIC();
+    kMaskPICInterrupt(0);
+    kEnableInterrupt();
+    kPrintString(1, 16, "Pass");
+
     int i = 0;
     while (1) {
         if (kIsOutputBufferFull()) {
@@ -39,7 +46,7 @@ void Main() {
             BYTE bFlags;
             if (kConvertScanCodeToASCIICode(bTemp, &vcTemp[0], &bFlags)) {
                 if (bFlags & KEY_FLAGS_DOWN) {
-                    kPrintString(i++, 16, vcTemp);
+                    kPrintString(i++, 17, vcTemp);
 
                     if (vcTemp[0] == '0') {
                         int tmp = 0;

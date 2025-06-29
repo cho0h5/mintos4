@@ -45,7 +45,7 @@ void kKeyboardHandler(int iVectorNumber) {
     g_iKeyboardInterruptCount += 1;
     g_iKeyboardInterruptCount %= 10;
 
-    kPrintString(70, 0, vcBuffer);
+    kPrintString(70, 1, vcBuffer);
 
     kSendEOIToPIC(iVectorNumber - 32);
 }
