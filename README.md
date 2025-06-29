@@ -26,3 +26,5 @@ NASM version 2.16.03 compiled on May 13 2025
     - SHIFT를 누른 체로 다른 키도 눌러야 그 때 연속해서 scan code가 인식됨
 - ch12. 391p kInitializeTSSSegment에 오타
     - TSSDATA -> TSSSEGMENT
+- ch13. 링킹 중 `InterruptHandler.c`에서 `__stack_chk_fail`에러 발생
+    - `02.Kernel64/Makefile`의 GCC64에 `-fno-stack-protector` 추가
