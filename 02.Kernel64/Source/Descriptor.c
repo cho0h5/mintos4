@@ -1,6 +1,7 @@
 #include "Types.h"
 #include "Descriptor.h"
 #include "Utility.h"
+#include "ISR.h"
 
 // GDT
 
@@ -64,8 +65,53 @@ void kInitializeIDTTables() {
     pstIDTR->qwBaseAddress = (QWORD)pstEntry;
     pstIDTR->wLimit = 100 * sizeof(IDTENTRY) - 1;
 
-    for (int i = 0; i < 100; i++) {
-        kSetIDTEntry(&pstEntry[i], kDummyHandler, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    // Exception
+    kSetIDTEntry(&pstEntry[0], kISRDivideError, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[1], kISRDebug, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[2], kISRNMI, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[3], kISRBreakPoint, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[4], kISROverflow, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[5], kISRBoundRangeExceeded, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[6], kISRInvalidOpcode, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[7], kISRDeviceNotAvailable, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[8], kISRDoubleFault, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[9], kISRCoprocessor, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[10], kISRInvalidTSS, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[11], kISRSegmentNotPresent, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[12], kISRStackSegmentFault, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[13], kISRGeneralProtection, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[14], kISRPageFault, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[15], kISR15, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[16], kISRFPUError, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[17], kISRAlignmentCheck, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[18], kISRMachineCheck, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[19], kISRSIMDError, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[20], kISRETCException, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+
+    for (int i = 20; i < 32; i++) {
+        kSetIDTEntry(&pstEntry[i], kISRETCException, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    }
+
+    // Interrupt
+    kSetIDTEntry(&pstEntry[32], kISRTimer, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[33], kISRKeyboard, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[34], kISRSlavePIC, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[35], kISRSerial2, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[36], kISRSerial1, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[37], kISRParallel2, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[38], kISRFloppy, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[39], kISRParallel1, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[40], kISRRTC, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[41], kISRReserved, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[42], kISRNotUsed1, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[43], kISRNotUsed2, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[44], kISRMouse, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[45], kISRCoprocessor, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[46], kISRHDD1, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+    kSetIDTEntry(&pstEntry[47], kISRHDD2, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
+
+    for (int i = 48; i < IDT_MAXENTRYCOUNT; i++) {
+        kSetIDTEntry(&pstEntry[i], kISRETCInterrupt, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);
     }
 }
 
@@ -77,22 +123,4 @@ void kSetIDTEntry(IDTENTRY *pstEntry, void *pvHandler, WORD wSelector, BYTE bIST
     pstEntry->wMiddleBaseAddress = ((QWORD)pvHandler >> 16) & 0xffff;
     pstEntry->dwUpperBaseAddress = (QWORD)pvHandler >> 32;
     pstEntry->dwReserved = 0;
-}
-
-static void kPrintString(const int iX, const int iY, const char *pcString) {
-    CHARACTER *pstScreen = (CHARACTER *)0xb8000;
-
-    pstScreen += (iY * 80) + iX;
-    for (int i = 0; pcString[i] != '\0'; i++) {
-        pstScreen[i].bCharactor = pcString[i];
-    }
-}
-
-void kDummyHandler() {
-    kPrintString(0, 0, "========================================");
-    kPrintString(0, 1, "     Dummy Interrupt Handler Called     ");
-    kPrintString(0, 2, "            Interrupt Occur             ");
-    kPrintString(0, 3, "========================================");
-
-    while (1) ;
 }
