@@ -2,6 +2,7 @@
 #define __TASK_H__
 
 #include "Types.h"
+#include "List.h"
 
 #define TASK_REGISTERCOUNT  (5 + 19)
 #define TASK_REGISTERSIZE   8
@@ -31,6 +32,9 @@
 #define TASK_RSPOFFSET      22
 #define TASK_SSOFFSET       23
 
+#define TASK_TCBPOOLADDRESS 0x800000
+#define TASK_MAXCOUNT       1024
+
 #pragma pack(push, 1)
 
 typedef struct kContextStruct {
@@ -38,14 +42,22 @@ typedef struct kContextStruct {
 } CONTEXT;
 
 typedef struct kTaskControlBlockStruct {
-    CONTEXT stContext;
+    LISTLINK stLink;
 
-    QWORD qwID;
     QWORD qwFlags;
+
+    CONTEXT stContext;
 
     void *pvStackAddress;
     QWORD qwStackSize;
 } TCB;
+
+typedef struct kTCBPoolManagerStruct {
+    TCB *pstStartAddress;
+    int iMaxCount;
+    int iUseCount;
+    int iAllocatedCount;
+} TCBPOOLMANAGER;
 
 #pragma pack(pop)
 

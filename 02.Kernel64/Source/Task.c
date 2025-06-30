@@ -2,6 +2,55 @@
 #include "Utility.h"
 #include "Descriptor.h"
 
+static TCBPOOLMANAGER gs_stTCBPoolManager;
+
+void kInitializeTCBPool() {
+    kMemSet(&gs_stTCBPoolManager, 0, sizeof(gs_stTCBPoolManager));
+
+    gs_stTCBPoolManager.pstStartAddress = (TCB *)TASK_TCBPOOLADDRESS;
+    kMemSet((void *)TASK_TCBPOOLADDRESS, 0, sizeof(TCB) * TASK_MAXCOUNT);
+
+    for (int i = 0; i < TASK_MAXCOUNT; i++) {
+        gs_stTCBPoolManager.pstStartAddress[i].stLink.qwID = i;
+    }
+
+    gs_stTCBPoolManager.iMaxCount = TASK_MAXCOUNT;
+    gs_stTCBPoolManager.iAllocatedCount = 1;
+}
+
+TCB *kAllocateTCB() {
+    if (gs_stTCBPoolManager.iUseCount == gs_stTCBPoolManager.iMaxCount) {
+        return NULL;
+    }
+
+    TCB *pstEmptyTCB;
+    int i = 0;
+    for (; i < gs_stTCBPoolManager.iMaxCount; i++) {
+        if ((gs_stTCBPoolManager.pstStartAddress[i].stLink.qwID >> 32) == 0) {
+            pstEmptyTCB = &gs_stTCBPoolManager.pstStartAddress[i];
+            break;
+        }
+    }
+
+    pstEmptyTCB->stLink.qwID = ((QWORD)gs_stTCBPoolManager.iAllocatedCount << 32) | i;
+    gs_stTCBPoolManager.iUseCount++;
+    gs_stTCBPoolManager.iAllocatedCount++;
+    if (gs_stTCBPoolManager.iAllocatedCount == 0) {
+        gs_stTCBPoolManager.iAllocatedCount = 1;
+    }
+
+    return pstEmptyTCB;
+}
+
+void kFreeTCB(QWORD qwID) {
+    const int i = qwID & 0xffffffff;
+
+    kMemSet(&gs_stTCBPoolManager.pstStartAddress[i].stContext, 0, sizeof(CONTEXT));
+    gs_stTCBPoolManager.pstStartAddress[i].stLink.qwID = i;
+
+    gs_stTCBPoolManager.iUseCount--;
+}
+
 void kSetUpTask(TCB *pstTCB, QWORD qwID, QWORD qwFlags, QWORD qwEntryPointAddress,
         void *pvStackAddress, QWORD qwStackSize) {
     // Init
@@ -26,7 +75,6 @@ void kSetUpTask(TCB *pstTCB, QWORD qwID, QWORD qwFlags, QWORD qwEntryPointAddres
     pstTCB->stContext.vqRegister[TASK_RFLAGSOFFSET] |= 0x0200;
 
     // ID, stack, flags
-    pstTCB->qwID = qwID;
     pstTCB->pvStackAddress = pvStackAddress;
     pstTCB->qwStackSize = qwStackSize;
     pstTCB->qwFlags = qwFlags;
