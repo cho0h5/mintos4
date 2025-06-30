@@ -73,8 +73,15 @@ typedef struct kSchedulerStruct {
 
 #pragma pack(pop)
 
+// Task
+void kInitializeTCBPool();
+TCB *kAllocateTCB();
+void kFreeTCB(QWORD qwID);
+TCB *kCreateTask(QWORD qwFlags, QWORD qwEntryPointAddress);
 void kSetUpTask(TCB *pstTCB, QWORD qwFlags, QWORD qwEntryPointAddress,
         void *pvStackAddress, QWORD qwStackSize);
+
+// Scheduler
 void kInitializeScheduler();
 void kSetRunningTask(TCB *pstTask);
 TCB *kGetRunningTask();
