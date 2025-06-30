@@ -56,7 +56,22 @@ void kFreeTCB(QWORD qwID) {
     gs_stTCBPoolManager.iUseCount--;
 }
 
-void kSetUpTask(TCB *pstTCB, QWORD qwID, QWORD qwFlags, QWORD qwEntryPointAddress,
+TCB *kCreateTask(QWORD qwFlags, QWORD qwEntryPointAddress) {
+    TCB *pstTask = kAllocateTCB();
+    if (pstTask == NULL) {
+        return NULL;
+    }
+
+    void *pvStackAddress = (void *)(TASK_STACKPOOLADDRESS +
+            TASK_STACKSIZE * (pstTask->stLink.qwID & 0xffffffff));
+
+    kSetUpTask(pstTask, qwFlags, qwEntryPointAddress, pvStackAddress, TASK_STACKSIZE);
+    kAddTaskToReadyList(pstTask);
+
+    return pstTask;
+}
+
+void kSetUpTask(TCB *pstTCB, QWORD qwFlags, QWORD qwEntryPointAddress,
         void *pvStackAddress, QWORD qwStackSize) {
     // Init
     kMemSet(pstTCB->stContext.vqRegister, 0, sizeof(pstTCB->stContext.vqRegister));
@@ -152,4 +167,17 @@ BOOL kScheduleInInterrupt() {
 
     gs_stScheduler.iProcessorTime = TASK_PROCESSORTIME;
     return TRUE;
+}
+
+void kDecreaseProcessorTime() {
+    if (gs_stScheduler.iProcessorTime > 0) {
+        gs_stScheduler.iProcessorTime--;
+    }
+}
+
+BOOL kIsProcessorTimeExpired() {
+    if (gs_stScheduler.iProcessorTime <= 0) {
+        return TRUE;
+    }
+    return FALSE;
 }
