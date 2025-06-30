@@ -16,5 +16,6 @@ void kLoadIDTR(QWORD qwIDTRAddress);
 void kEnableInterrupt();
 void kDisableInterrupt();
 QWORD kReadRFLAGS();
+QWORD kReadTSC();
 
 #endif

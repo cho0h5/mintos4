@@ -6,6 +6,7 @@
 #include "Console.h"
 #include "ConsoleShell.h"
 #include "Utility.h"
+#include "PIT.h"
 
 void Main() {
     kInitializeConsole(0, 10);
