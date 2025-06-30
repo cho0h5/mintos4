@@ -7,6 +7,7 @@
 #include "ConsoleShell.h"
 #include "Utility.h"
 #include "PIT.h"
+#include "Task.h"
 
 void Main() {
     kInitializeConsole(0, 10);
@@ -39,6 +40,12 @@ void Main() {
 
     kPrintf("[    ] Total RAM Size Check\n");
     kCheckTotalRAMSize();
+    kSetCursor(1, iCursorY++);
+    kPrintf("Pass\n");
+
+    kPrintf("[    ] TCB PoolAnd Scheduler Initialize\n");
+    kInitializeScheduler();
+    kInitializePIT(MSTOCOUNT(1), 1);
     kSetCursor(1, iCursorY++);
     kPrintf("Pass\n");
 
