@@ -2,6 +2,7 @@
 #define __ASSEMBLYUTILITY_C__
 
 #include "Types.h"
+#include "Task.h"
 
 // Keyboard
 BYTE kInPortByte(WORD wPort);
@@ -17,5 +18,8 @@ void kEnableInterrupt();
 void kDisableInterrupt();
 QWORD kReadRFLAGS();
 QWORD kReadTSC();
+
+// Task
+void kSwitchContext(CONTEXT *pstCurrentContext, CONTEXT *pstNextContext);
 
 #endif
