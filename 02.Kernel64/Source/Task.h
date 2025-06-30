@@ -35,6 +35,8 @@
 #define TASK_TCBPOOLADDRESS 0x800000
 #define TASK_MAXCOUNT       1024
 
+#define TASK_PROCESSORTIME  5
+
 #pragma pack(push, 1)
 
 typedef struct kContextStruct {
@@ -59,9 +61,22 @@ typedef struct kTCBPoolManagerStruct {
     int iAllocatedCount;
 } TCBPOOLMANAGER;
 
+typedef struct kSchedulerStruct {
+    TCB *pstRunningTask;
+    int iProcessorTime;
+    LIST stReadyList;
+} SCHEDULER;
+
 #pragma pack(pop)
 
 void kSetUpTask(TCB *pstTCB, QWORD qwID, QWORD qwFlags, QWORD qwEntryPointAddress,
         void *pvStackAddress, QWORD qwStackSize);
+void kInitializeScheduler();
+void kSetRunningTask(TCB *pstTask);
+TCB *kGetRunningTask();
+TCB *kGetNextTaskToRun();
+void kAddTaskToReadyList(TCB *pstTask);
+void kSchedule();
+BOOL kScheduleInInterrupt();
 
 #endif

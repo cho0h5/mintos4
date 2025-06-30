@@ -1,8 +1,13 @@
 #include "Task.h"
 #include "Utility.h"
+#include "AssemblyUtility.h"
 #include "Descriptor.h"
+#include "List.h"
 
 static TCBPOOLMANAGER gs_stTCBPoolManager;
+static SCHEDULER gs_stScheduler;
+
+// Task
 
 void kInitializeTCBPool() {
     kMemSet(&gs_stTCBPoolManager, 0, sizeof(gs_stTCBPoolManager));
@@ -78,4 +83,73 @@ void kSetUpTask(TCB *pstTCB, QWORD qwID, QWORD qwFlags, QWORD qwEntryPointAddres
     pstTCB->pvStackAddress = pvStackAddress;
     pstTCB->qwStackSize = qwStackSize;
     pstTCB->qwFlags = qwFlags;
+}
+
+// Scheduler
+
+void kInitializeScheduler() {
+    kInitializeTCBPool();
+    kInitializeList(&gs_stScheduler.stReadyList);
+    gs_stScheduler.pstRunningTask = kAllocateTCB();
+}
+
+void kSetRunningTask(TCB *pstTask) {
+    gs_stScheduler.pstRunningTask = pstTask;
+}
+
+TCB *kGetRunningTask() {
+    return gs_stScheduler.pstRunningTask;
+}
+
+TCB *kGetNextTaskToRun() {
+    if (kGetListCount(&gs_stScheduler.stReadyList) == 0) {
+        return NULL;
+    }
+
+    return (TCB *)kRemoveListFromHeader(&gs_stScheduler.stReadyList);
+}
+
+void kAddTaskToReadyList(TCB *pstTask) {
+    kAddListToTail(&gs_stScheduler.stReadyList, pstTask);
+}
+
+void kSchedule() {
+    if (kGetListCount(&gs_stScheduler.stReadyList) == 0) {
+        return;
+    }
+
+    const BOOL bPreviousFlag = kSetInterruptFlag(FALSE);
+    TCB *pstNextTask = kGetNextTaskToRun();
+    if (pstNextTask == NULL) {
+        kSetInterruptFlag(bPreviousFlag);
+        return;
+    }
+
+    TCB *pstRunningTask = gs_stScheduler.pstRunningTask;
+    kAddTaskToReadyList(pstRunningTask);
+
+    gs_stScheduler.iProcessorTime = TASK_PROCESSORTIME;
+
+    gs_stScheduler.pstRunningTask = pstNextTask;
+    kSwitchContext(&pstRunningTask->stContext, &pstNextTask->stContext);
+
+    kSetInterruptFlag(bPreviousFlag);
+}
+
+BOOL kScheduleInInterrupt() {
+    TCB *pstNextTask = kGetNextTaskToRun();
+    if (pstNextTask == NULL) {
+        return FALSE;
+    }
+
+    char *pcContextAddress = (char *)IST_STARTADDRESS + IST_SIZE - sizeof(CONTEXT);
+    TCB *pstRunningTask = gs_stScheduler.pstRunningTask;
+    kMemCpy(&pstRunningTask->stContext, pcContextAddress, sizeof(CONTEXT));
+    kAddTaskToReadyList(pstRunningTask);
+
+    gs_stScheduler.pstRunningTask = pstNextTask;
+    kMemCpy(pcContextAddress, &pstNextTask->stContext, sizeof(CONTEXT));
+
+    gs_stScheduler.iProcessorTime = TASK_PROCESSORTIME;
+    return TRUE;
 }

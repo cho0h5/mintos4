@@ -1,5 +1,15 @@
 #include "List.h"
 
+void kInitializeList(LIST *pstList) {
+    pstList->iItemCount = 0;
+    pstList->pvHeader = NULL;
+    pstList->pvTail = NULL;
+}
+
+int kGetListCount(const LIST *pstList) {
+    return pstList->iItemCount;
+}
+
 void kAddListToTail(LIST *pstList, void *pvItem) {
     LISTLINK *pstLink = (LISTLINK *)pvItem;
     pstLink->pvNext = NULL;
