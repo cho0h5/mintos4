@@ -206,7 +206,7 @@ void kSchedule() {
     }
 
     TCB *pstRunningTask = gs_stScheduler.pstRunningTask;
-    kAddTaskToReadyList(pstRunningTask);
+    gs_stScheduler.pstRunningTask = pstNextTask;
 
     if ((pstRunningTask->qwFlags & TASK_FLAGS_IDLE) == TASK_FLAGS_IDLE) {
         gs_stScheduler.qwSpendProcessorTimeInIdleTask +=
@@ -219,7 +219,7 @@ void kSchedule() {
         kAddListToTail(&gs_stScheduler.stWaitList, pstRunningTask);
         kSwitchContext(NULL, &pstNextTask->stContext);
     } else {
-        gs_stScheduler.pstRunningTask = pstNextTask;
+        kAddTaskToReadyList(pstRunningTask);
         kSwitchContext(&pstRunningTask->stContext, &pstNextTask->stContext);
     }
 
