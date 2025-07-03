@@ -18,6 +18,6 @@
 
 void kReadRTCTime(BYTE *pbHour, BYTE *pbMinute, BYTE *pbSecond);
 void kReadRTCDate(WORD *pbYear, BYTE *pbMonth, BYTE *pbDayOfMonth, BYTE *pbDayOfWeek);
-char *kConvertDayOfWeekToString(const BYTE bDayOfWeek);
+const char *kConvertDayOfWeekToString(const BYTE bDayOfWeek);
 
 #endif

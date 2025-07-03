@@ -40,7 +40,7 @@ void kReadRTCDate(WORD *pbYear, BYTE *pbMonth, BYTE *pbDayOfMonth, BYTE *pbDayOf
     *pbDayOfWeek = RTC_BCDTOBINARY(bData);
 }
 
-char *kConvertDayOfWeekToString(const BYTE bDayOfWeek) {
+const char *kConvertDayOfWeekToString(const BYTE bDayOfWeek) {
     static const char *vpcDayOfWeekString[8] = {"Error", "Sunday", "Monday",
         "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
