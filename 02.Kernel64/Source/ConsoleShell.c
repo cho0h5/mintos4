@@ -328,7 +328,7 @@ void kCreateTestTask(const char *pcParameterBuffer) {
     switch (kAToI(vcType, 10)) {
         case 1:
             for (int i = 0; i < iCount; i++) {
-                if (kCreateTask(0, (QWORD)kTestTask1) == NULL) {
+                if (kCreateTask(TASK_FLAGS_LOW, (QWORD)kTestTask1) == NULL) {
                     break;
                 }
             }
@@ -339,7 +339,7 @@ void kCreateTestTask(const char *pcParameterBuffer) {
         case 2:
         default:
             for (int i = 0; i < iCount; i++) {
-                if (kCreateTask(0, (QWORD)kTestTask2) == NULL) {
+                if (kCreateTask(TASK_FLAGS_LOW, (QWORD)kTestTask2) == NULL) {
                     break;
                 }
             }

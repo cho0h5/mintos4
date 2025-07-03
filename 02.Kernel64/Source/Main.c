@@ -66,5 +66,6 @@ void Main() {
     kSetCursor(1, iCursorY++);
     kPrintf("Pass\n");
 
+    kCreateTask(TASK_FLAGS_LOWEST | TASK_FLAGS_IDLE, (QWORD)kIdleTask);
     kStartConsoleShell();
 }

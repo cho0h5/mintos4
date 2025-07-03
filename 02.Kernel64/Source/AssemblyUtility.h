@@ -21,5 +21,6 @@ QWORD kReadTSC();
 
 // Task
 void kSwitchContext(CONTEXT *pstCurrentContext, CONTEXT *pstNextContext);
+void kHlt();
 
 #endif

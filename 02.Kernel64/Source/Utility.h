@@ -22,6 +22,7 @@ int kDecimalToString(long lValue, char *pcBuffer);
 int kHexToString(QWORD qwValue, char *pcBuffer);
 int kReverseString(char *pcBuffer);
 int kVSPrintf(char *pcBuffer, const char *pcFormatString, va_list ap);
+QWORD kGetTickCount();
 
 extern volatile QWORD g_qwTickCount;
 

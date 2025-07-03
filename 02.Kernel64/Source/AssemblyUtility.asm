@@ -6,7 +6,7 @@ global kInPortByte, kOutPortByte
 global kLoadGDTR, kLoadTR, kLoadIDTR
 global kEnableInterrupt, kDisableInterrupt, kReadRFLAGS
 global kReadTSC
-global kSwitchContext
+global kSwitchContext, kHlt
 
 ; Keyboard
 
@@ -167,3 +167,8 @@ kSwitchContext:
 
     KLOADCONTEXT
     iretq
+
+kHlt:
+    hlt
+    hlt
+    ret
