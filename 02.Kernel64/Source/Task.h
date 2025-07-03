@@ -96,20 +96,20 @@ typedef struct kSchedulerStruct {
 #pragma pack(pop)
 
 // Task
-void kInitializeTCBPool();
-TCB *kAllocateTCB();
-void kFreeTCB(QWORD qwID);
+static void kInitializeTCBPool();
+static TCB *kAllocateTCB();
+static void kFreeTCB(QWORD qwID);
 TCB *kCreateTask(QWORD qwFlags, QWORD qwEntryPointAddress);
-void kSetUpTask(TCB *pstTCB, QWORD qwFlags, QWORD qwEntryPointAddress,
+static void kSetUpTask(TCB *pstTCB, QWORD qwFlags, QWORD qwEntryPointAddress,
         void *pvStackAddress, QWORD qwStackSize);
 
 // Scheduler
 void kInitializeScheduler();
 void kSetRunningTask(TCB *pstTask);
 TCB *kGetRunningTask();
-TCB *kGetNextTaskToRun();
-BOOL kAddTaskToReadyList(TCB *pstTask);
-TCB *kRemoveTaskFromReadyList(QWORD qwTaskID);
+static TCB *kGetNextTaskToRun();
+static BOOL kAddTaskToReadyList(TCB *pstTask);
+static TCB *kRemoveTaskFromReadyList(QWORD qwTaskID);
 BOOL kChangePriority(QWORD qwTaskID, BYTE bPriority);
 BOOL kAddTaskToReadyList(TCB *pstTask);
 void kSchedule();
