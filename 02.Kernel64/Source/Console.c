@@ -90,7 +90,9 @@ BYTE kGetCh() {
     KEYDATA stData;
 
     while (1) {
-        while (!kGetKeyFromKeyQueue(&stData)) ;
+        while (!kGetKeyFromKeyQueue(&stData)) {
+            kSchedule();
+        };
 
         if (stData.bFlags & KEY_FLAGS_DOWN) {
             return stData.bASCIICode;
