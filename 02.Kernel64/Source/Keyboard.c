@@ -4,6 +4,7 @@
 #include "Queue.h"
 #include "AssemblyUtility.h"
 #include "Utility.h"
+#include "Syncronization.h"
 
 BOOL kIsOutputBufferFull() {
     if (kInPortByte(0x64) & 0x01) {
@@ -290,13 +291,13 @@ BOOL kConvertScanCodeAndPutQueue(BYTE bScanCode) {
 
     if (kConvertScanCodeToASCIICode(bScanCode, &stData.bASCIICode, &stData.bFlags)) {
         // Disable interrupt
-        BOOL bPreviousInterrupt = kSetInterruptFlag(FALSE);
+        const BOOL bPreviousInterrupt = kLockForSystemData();
 
         // Put to Queue
         bResult = kPutQueue(&gs_stKeyQueue, &stData);
 
         // Restore Interrupt
-        kSetInterruptFlag(bPreviousInterrupt);
+        kUnlockForSystemData(bPreviousInterrupt);
     }
 
     return bResult;
@@ -308,13 +309,13 @@ BOOL kGetKeyFromKeyQueue(KEYDATA *pstData) {
     }
 
     // Disable interrupt
-    BOOL bPreviousInterrupt = kSetInterruptFlag(FALSE);
+    const BOOL bPreviousInterrupt = kLockForSystemData();
 
     // Get from queue
     BOOL bResult = kGetQueue(&gs_stKeyQueue, pstData);
 
     // Restore Interrupt
-    kSetInterruptFlag(bPreviousInterrupt);
+    kUnlockForSystemData(bPreviousInterrupt);
 
     return bResult;
 }
