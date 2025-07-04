@@ -27,6 +27,7 @@ SHELLCOMMANENTRY gs_vstCommandTable[] = {
     {"cpuload", "Show Processor Load", kCPULoad},
     {"testmutex", "Test Mutex Function", kTestMutex},
     {"testthread", "Test Thread and Process Function", kTestThread},
+    {"showmatrix", "Show Matrix Screen", kShowMatrix},
 };
 
 void kStartConsoleShell() {
@@ -524,5 +525,64 @@ static void kTestThread(const char *pcParameterBuffer) {
         kPrintf("Process [0x%Q] Create Success\n", pstProcess->stLink.qwID);
     } else {
         kPrintf("Process Create Fail\n");
+    }
+}
+
+static volatile QWORD gs_qwRandomValue = 0;
+
+QWORD kRandom() {
+    gs_qwRandomValue = (gs_qwRandomValue * 412153 + 5571031) >> 16;
+    return gs_qwRandomValue;
+}
+
+static void kDropCharacterThread() {
+    char vcText[2] = { 0, };
+
+    const int iX = kRandom() % CONSOLE_WIDTH;
+
+    while (1) {
+        kSleep(kRandom() % 20);
+
+        if (kRandom() % 20 < 15) {
+            vcText[0] = ' ';
+            for (int i = 0; i < CONSOLE_HEIGHT - 1; i++) {
+                kPrintStringXY(iX, i, vcText);
+                kSleep(50);
+            }
+        } else {
+            for (int i = 0; i < CONSOLE_HEIGHT - 1; i++) {
+                vcText[0] = i + kRandom();
+                kPrintStringXY(iX, i, vcText);
+                kSleep(50);
+            }
+        }
+    }
+}
+
+static void kMatrixProcess() {
+    int i = 0;
+    for (; i < 300; i++) {
+        if (kCreateTask(TASK_FLAGS_THREAD | TASK_FLAGS_LOW, 0, 0, (QWORD)kDropCharacterThread) == NULL) {
+            break;
+        }
+
+        kSleep(kRandom() % 5 + 5);
+    }
+
+    kPrintf("%d Thread is created\n", i);
+
+    kGetCh();
+}
+
+static void kShowMatrix(const char *pcParameterBuffer) {
+    TCB *pstProcess = kCreateTask(TASK_FLAGS_PROCESS | TASK_FLAGS_LOW, (void *)0xe00000, 0xe00000, (QWORD)kMatrixProcess);
+    if (pstProcess != NULL) {
+        kPrintf("Matrix Process [0x%Q] Create Success\n");
+
+        while ((pstProcess->stLink.qwID >> 32) != 0) {
+            kSleep(100);
+        }
+    } else {
+        kPrintf("Matrix Process Create Fail");
     }
 }
