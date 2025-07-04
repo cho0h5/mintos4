@@ -18,5 +18,8 @@ typedef struct kMutexStruct {
 
 BOOL kLockForSystemData();
 void kUnlockForSystemData(const BOOL bInterruptFlag);
+void kInitializeMutex(MUTEX *pstMutex);
+void kLock(MUTEX *pstMutex);
+void kUnlock(MUTEX *pstMutex);
 
 #endif

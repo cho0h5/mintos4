@@ -6,6 +6,7 @@
 #include "PIT.h"
 #include "RTC.h"
 #include "Task.h"
+#include "Syncronization.h"
 
 SHELLCOMMANENTRY gs_vstCommandTable[] = {
     {"help", "Show help", kHelp},
@@ -22,8 +23,9 @@ SHELLCOMMANENTRY gs_vstCommandTable[] = {
     {"changepriority", "Change Task Priority. Usage: changepriority 1(ID) 2(Priority)",
         kChangeTaskPriority},
     {"tasklist", "Show Task List", kShowTaskList},
-    {"killtask", "End Task. Usage: killtask 1(ID)", kKillTask},
+    {"killtask", "End Task. Usage: killtask 1(ID) or 0xffffffff(All Task)", kKillTask},
     {"cpuload", "Show Processor Load", kCPULoad},
+    {"testmutex", "Test Mutex Function", kTestMutex},
 };
 
 void kStartConsoleShell() {
@@ -421,14 +423,73 @@ static void kKillTask(const char *pcParameterBuffer) {
         qwID = kAToI(vcID, 10);
     }
 
-    kPrintf("Kill Task ID [0x%q] ", qwID);
-    if (kEndTask(qwID)) {
-        kPrintf("Success\n");
-    } else {
-        kPrintf("Fail\n");
+    if (qwID != 0xffffffff) {
+        kPrintf("Kill Task ID [0x%q] ", qwID);
+        if (kEndTask(qwID)) {
+            kPrintf("Success\n");
+        } else {
+            kPrintf("Fail\n");
+        }
+        return;
+    }
+
+    for (int i = 2; i < TASK_MAXCOUNT; i++) {
+        TCB *pstTCB = kGetTCBInTCBPool(i);
+        qwID = pstTCB->stLink.qwID;
+        if ((qwID >> 32) == 0) {
+            continue;
+        }
+
+        kPrintf("Kill Task ID [0x%q] ", qwID);
+        if (kEndTask(qwID)) {
+            kPrintf("Success\n");
+        } else {
+            kPrintf("Fail\n");
+        }
     }
 }
 
 static void kCPULoad(const char *pcParameterBuffer) {
     kPrintf("Processor Load: %d%%\n", kGetProcessorLoad());
+}
+
+static MUTEX gs_stMutex;
+static volatile QWORD gs_qwAdder;
+
+static void kPrintNumberTask() {
+    QWORD qwTickCount = kGetTickCount();
+    while (kGetTickCount() - qwTickCount < 50) {
+        kSchedule();
+    }
+
+    for (int i = 0; i < 5; i++) {
+        kLock(&gs_stMutex);
+        kPrintf("Task ID [0x%Q] Value[%d]\n", kGetRunningTask()->stLink.qwID, gs_qwAdder);
+
+        gs_qwAdder += 1;
+        kUnlock(&gs_stMutex);
+
+        for (int j = 0; j < 30000; j++) ;
+    }
+
+    qwTickCount = kGetTickCount();
+    while (kGetTickCount() - qwTickCount < 1000) {
+        kSchedule();
+    }
+
+    kExitTask();
+}
+
+static void kTestMutex(const char *pcParameterBuffer) {
+    gs_qwAdder = 1;
+
+    kInitializeMutex(&gs_stMutex);
+
+    int i = 0;
+    for (; i < 3; i++) {
+        kCreateTask(TASK_FLAGS_LOW, (QWORD)kPrintNumberTask);
+    }
+
+    kPrintf("Wait Util %d Task End...\n", i);
+    kGetCh();
 }
