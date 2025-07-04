@@ -38,7 +38,7 @@ kReadCPUID:
 
 kSwitchAndExecute64bitKernel:
     mov eax, cr4
-    or eax, 0x20
+    or eax, 0x620
     mov cr4, eax
 
     mov eax, 0x100000
