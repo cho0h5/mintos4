@@ -588,6 +588,50 @@ static void kShowMatrix(const char *pcParameterBuffer) {
     }
 }
 
+static void kFPUTestTask() {
+    const char vcData[4] = {'-', '\\', '|', '/'};
+    CHARACTER *pstScreen = (CHARACTER *)CONSOLE_VIDEOMEMORYADDRESS;
+
+    const TCB *pstRunningTask = kGetRunningTask();
+    int iOffset = (pstRunningTask->stLink.qwID & 0xffffffff) * 2;
+    iOffset = CONSOLE_WIDTH * CONSOLE_HEIGHT - (iOffset % (CONSOLE_WIDTH * CONSOLE_HEIGHT));
+
+    QWORD qwCount = 0;
+    while (1) {
+        double dValue1 = 1;
+        double dValue2 = 1;
+
+        for (int i = 0; i < 10; i++) {
+            QWORD qwRandomValue = kRandom();
+            dValue1 *= (double)qwRandomValue;
+            dValue2 *= (double)qwRandomValue;
+
+            kSleep(1);
+
+            qwRandomValue = kRandom();
+            dValue1 /= (double)qwRandomValue;
+            dValue2 /= (double)qwRandomValue;
+        }
+
+        if (dValue1 != dValue2) {
+            kPrintf("Value Is Not Same. [%f] != [%f]\n", dValue1, dValue2);
+            break;
+        }
+
+        qwCount++;
+        pstScreen[iOffset].bCharactor = vcData[qwCount % 4];
+        pstScreen[iOffset].bAttribute = (iOffset % 15) + 1;
+    }
+}
+
 static void kTestPIE(const char *pcParameterBuffer) {
-    // TODO
+    kPrintf("PIE Calculation Test\n");
+    kPrintf("Result: 355 / 113 = ");
+    const double dResult = (double)355 / 113;
+    kPrintf("%d.%d%d\n", (QWORD)dResult, ((QWORD)(dResult * 10) % 10),
+            ((QWORD)(dResult * 100) % 10));
+
+    for (int i = 0; i < 100; i++) {
+        kCreateTask(TASK_FLAGS_LOW | TASK_FLAGS_THREAD, 0, 0, (QWORD)kFPUTestTask);
+    }
 }

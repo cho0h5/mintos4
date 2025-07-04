@@ -249,6 +249,25 @@ int kVSPrintf(char *pcBuffer, const char *pcFormatString, va_list ap) {
                     iBufferIndex += kIToA(qwValue, pcBuffer + iBufferIndex, 16);
                     break;
 
+                case 'f':
+                    double dValue = (double)va_arg(ap, double);
+                    dValue += 0.005;
+                    pcBuffer[iBufferIndex] = '0' + (QWORD)(dValue * 100) % 10;
+                    pcBuffer[iBufferIndex + 1] = '0' + (QWORD)(dValue * 10) % 10;
+                    pcBuffer[iBufferIndex + 2] = '.';
+                    int  k = 0;
+                    for (; ; k++) {
+                        if ((QWORD)dValue == 0 && k != 0) {
+                            break;
+                        }
+                        pcBuffer[iBufferIndex + 3 + k] = '0' + ((QWORD)dValue % 10);
+                        dValue = dValue / 10;
+                    }
+                    pcBuffer[iBufferIndex + 3 + k] = '\0';
+                    kReverseString(pcBuffer + iBufferIndex);
+                    iBufferIndex += 3 + k;
+                    break;
+
                 default:
                     pcBuffer[iBufferIndex] = pcFormatString[i];
                     iBufferIndex++;
