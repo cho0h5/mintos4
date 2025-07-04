@@ -267,3 +267,11 @@ int kVSPrintf(char *pcBuffer, const char *pcFormatString, va_list ap) {
 QWORD kGetTickCount() {
     return g_qwTickCount;
 }
+
+void kSleep(const QWORD qwMillisecond) {
+    QWORD qwLastTickCount = g_qwTickCount;
+
+    while (g_qwTickCount - qwLastTickCount <= qwMillisecond) {
+        kSchedule();
+    }
+}

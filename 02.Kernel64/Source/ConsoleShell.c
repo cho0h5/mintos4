@@ -26,6 +26,7 @@ SHELLCOMMANENTRY gs_vstCommandTable[] = {
     {"killtask", "End Task. Usage: killtask 1(ID) or 0xffffffff(All Task)", kKillTask},
     {"cpuload", "Show Processor Load", kCPULoad},
     {"testmutex", "Test Mutex Function", kTestMutex},
+    {"testthread", "Test Thread and Process Function", kTestThread},
 };
 
 void kStartConsoleShell() {
@@ -503,4 +504,25 @@ static void kTestMutex(const char *pcParameterBuffer) {
 
     kPrintf("Wait Util %d Task End...\n", i);
     kGetCh();
+}
+
+static void kCreateThreadTask() {
+    for (int i = 0; i < 3; i++) {
+        kCreateTask(TASK_FLAGS_LOW | TASK_FLAGS_THREAD, 0, 0, (QWORD)kTestTask2);
+    }
+
+    while (1) {
+        kSleep(1);
+    }
+}
+
+static void kTestThread(const char *pcParameterBuffer) {
+    const TCB *pstProcess = kCreateTask(TASK_FLAGS_LOW | TASK_FLAGS_PROCESS,
+            (void *)0xeeeeeeee, 0x1000, (QWORD)kCreateThreadTask);
+
+    if (pstProcess != NULL) {
+        kPrintf("Process [0x%Q] Create Success\n", pstProcess->stLink.qwID);
+    } else {
+        kPrintf("Process Create Fail\n");
+    }
 }
