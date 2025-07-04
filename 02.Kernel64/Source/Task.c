@@ -137,7 +137,7 @@ void kSetRunningTask(TCB *pstTask) {
 TCB *kGetRunningTask() {
     const BOOL bPreviousFlag = kLockForSystemData();
 
-    const TCB *pstRunningTask = gs_stScheduler.pstRunningTask;
+    TCB *pstRunningTask = gs_stScheduler.pstRunningTask;
 
     kUnlockForSystemData(bPreviousFlag);
     return pstRunningTask;

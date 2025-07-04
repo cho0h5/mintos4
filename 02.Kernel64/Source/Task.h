@@ -39,6 +39,8 @@
         sizeof(TCB) * TASK_MAXCOUNT)
 #define TASK_STACKSIZE      8192
 
+#define TASK_INVALIDID      0xffffffffffffffff
+
 #define TASK_PROCESSORTIME  5
 
 #define TASK_MAXREADYLISTCOUNT      5
