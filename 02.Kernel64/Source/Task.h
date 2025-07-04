@@ -1,6 +1,8 @@
 #ifndef __TASK_H__
 #define __TASK_H__
 
+#include <stddef.h>
+
 #include "Types.h"
 #include "List.h"
 
@@ -53,11 +55,16 @@
 #define TASK_FLAGS_WAIT             0xff
 
 #define TASK_FLAGS_ENDTASK          0x8000000000000000
+#define TASK_FLAGS_SYSTEM           0x4000000000000000
+#define TASK_FLAGS_PROCESS          0x2000000000000000
+#define TASK_FLAGS_THREAD           0x1000000000000000
 #define TASK_FLAGS_IDLE             0x0800000000000000
 
 #define GETPRIORITY(x)              ((x) & 0xff)
 #define SETPRIORITY(x, priority)    ((x) = ((x) & 0xffffffffffffff00) | (priority))
 #define GETTCBOFFSET(x)             ((x) & 0xffffffff)
+
+#define GETTCBFROMTHREADLINK(x)     (TCB *)((QWORD)x - offsetof(TCB, stThreadLink))
 
 #pragma pack(push, 1)
 
@@ -69,6 +76,13 @@ typedef struct kTaskControlBlockStruct {
     LISTLINK stLink;
 
     QWORD qwFlags;
+
+    void *pvMemoryAddress;
+    QWORD qwMemorySize;
+
+    LISTLINK stThreadLink;      // To connect between threads
+    LIST stChildThreadList;     // Only for process
+    QWORD qwParentProcessID;
 
     CONTEXT stContext;
 
@@ -101,7 +115,7 @@ typedef struct kSchedulerStruct {
 static void kInitializeTCBPool();
 static TCB *kAllocateTCB();
 static void kFreeTCB(QWORD qwID);
-TCB *kCreateTask(QWORD qwFlags, QWORD qwEntryPointAddress);
+TCB *kCreateTask(QWORD qwFlags, void *pvMemoryAddress, QWORD qwMemorySize, QWORD qwEntryPointAddress);
 static void kSetUpTask(TCB *pstTCB, QWORD qwFlags, QWORD qwEntryPointAddress,
         void *pvStackAddress, QWORD qwStackSize);
 
@@ -125,6 +139,7 @@ int kGetTaskCount();
 TCB *kGetTCBInTCBPool(const int iOffset);
 BOOL kIsTaskExist(const QWORD qwID);
 QWORD kGetProcessorLoad();
+static TCB *kGetProcessByThread(TCB *pstThread);
 
 // Idle task
 void kIdleTask();

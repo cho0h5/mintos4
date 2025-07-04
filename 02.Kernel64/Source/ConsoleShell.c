@@ -337,7 +337,7 @@ static void kCreateTestTask(const char *pcParameterBuffer) {
     switch (kAToI(vcType, 10)) {
         case 1:
             for (int i = 0; i < iCount; i++) {
-                if (kCreateTask(TASK_FLAGS_LOW, (QWORD)kTestTask1) == NULL) {
+                if (kCreateTask(TASK_FLAGS_LOW | TASK_FLAGS_THREAD, 0, 0, (QWORD)kTestTask1) == NULL) {
                     break;
                 }
             }
@@ -348,7 +348,7 @@ static void kCreateTestTask(const char *pcParameterBuffer) {
         case 2:
         default:
             for (int i = 0; i < iCount; i++) {
-                if (kCreateTask(TASK_FLAGS_LOW, (QWORD)kTestTask2) == NULL) {
+                if (kCreateTask(TASK_FLAGS_LOW | TASK_FLAGS_THREAD, 0, 0, (QWORD)kTestTask2) == NULL) {
                     break;
                 }
             }
@@ -404,8 +404,12 @@ static void kShowTaskList(const char *pcParameterBuffer) {
             kPrintf("\n");
         }
 
-        kPrintf("[%d] Task ID[0x%Q], Priority[%d], Flags[0x%Q]\n", iCount++,
-                pstTCB->stLink.qwID, GETPRIORITY(pstTCB->qwFlags), pstTCB->qwFlags);
+        kPrintf("[%d] Task ID[0x%Q], Priority[%d], Flags[0x%Q], Thread[%d]\n",
+                iCount++, pstTCB->stLink.qwID, GETPRIORITY(pstTCB->qwFlags),
+                pstTCB->qwFlags, kGetListCount(&pstTCB->stChildThreadList));
+        kPrintf("    Parent PID[0x%Q], Memory Address[0x%Q], Size[0x%Q]\n",
+                pstTCB->qwParentProcessID, pstTCB->pvMemoryAddress,
+                pstTCB->qwMemorySize);
     }
 }
 
@@ -424,27 +428,34 @@ static void kKillTask(const char *pcParameterBuffer) {
     }
 
     if (qwID != 0xffffffff) {
-        kPrintf("Kill Task ID [0x%q] ", qwID);
-        if (kEndTask(qwID)) {
-            kPrintf("Success\n");
+        TCB *pstTCB = kGetTCBInTCBPool(GETTCBOFFSET(qwID));
+        qwID = pstTCB->stLink.qwID;
+
+        if (((qwID >> 32) != 0) && ((pstTCB->qwFlags & TASK_FLAGS_SYSTEM) == 0x00)) {
+            kPrintf("Kill Task ID [0x%q] ", qwID);
+            if (kEndTask(qwID)) {
+                kPrintf("Success\n");
+            } else {
+                kPrintf("Fail\n");
+            }
+            return;
         } else {
-            kPrintf("Fail\n");
+            kPrintf("Task does not exist or task is system task\n");
+            return;
         }
-        return;
     }
 
     for (int i = 2; i < TASK_MAXCOUNT; i++) {
         TCB *pstTCB = kGetTCBInTCBPool(i);
         qwID = pstTCB->stLink.qwID;
-        if ((qwID >> 32) == 0) {
-            continue;
-        }
 
-        kPrintf("Kill Task ID [0x%q] ", qwID);
-        if (kEndTask(qwID)) {
-            kPrintf("Success\n");
-        } else {
-            kPrintf("Fail\n");
+        if (((qwID >> 32) != 0) && ((pstTCB->qwFlags & TASK_FLAGS_SYSTEM) == 0x00)) {
+            kPrintf("Kill Task ID [0x%q] ", qwID);
+            if (kEndTask(qwID)) {
+                kPrintf("Success\n");
+            } else {
+                kPrintf("Fail\n");
+            }
         }
     }
 }
@@ -487,7 +498,7 @@ static void kTestMutex(const char *pcParameterBuffer) {
 
     int i = 0;
     for (; i < 3; i++) {
-        kCreateTask(TASK_FLAGS_LOW, (QWORD)kPrintNumberTask);
+        kCreateTask(TASK_FLAGS_LOW | TASK_FLAGS_THREAD, 0, 0, (QWORD)kPrintNumberTask);
     }
 
     kPrintf("Wait Util %d Task End...\n", i);
