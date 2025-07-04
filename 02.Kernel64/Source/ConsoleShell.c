@@ -28,6 +28,7 @@ SHELLCOMMANENTRY gs_vstCommandTable[] = {
     {"testmutex", "Test Mutex Function", kTestMutex},
     {"testthread", "Test Thread and Process Function", kTestThread},
     {"showmatrix", "Show Matrix Screen", kShowMatrix},
+    {"testpie", "Test PIE Calculation", kTestPIE},
 };
 
 void kStartConsoleShell() {
@@ -585,4 +586,8 @@ static void kShowMatrix(const char *pcParameterBuffer) {
     } else {
         kPrintf("Matrix Process Create Fail");
     }
+}
+
+static void kTestPIE(const char *pcParameterBuffer) {
+    // TODO
 }

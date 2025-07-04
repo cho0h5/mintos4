@@ -95,6 +95,8 @@ TCB *kCreateTask(QWORD qwFlags, void *pvMemoryAddress, QWORD qwMemorySize, QWORD
 
     kInitializeList(&pstTask->stChildThreadList);
 
+    pstTask->bFPUUsed = FALSE;
+
     bPreviousFlag = kLockForSystemData();
     kAddTaskToReadyList(pstTask);
 
@@ -154,6 +156,8 @@ void kInitializeScheduler() {
 
     gs_stScheduler.qwSpendProcessorTimeInIdleTask = 0;
     gs_stScheduler.qwProcessorLoad = 0;
+
+    gs_stScheduler.qwLastFPUUsedTaskID = TASK_INVALIDID;
 }
 
 void kSetRunningTask(TCB *pstTask) {
@@ -265,6 +269,12 @@ void kSchedule() {
             TASK_PROCESSORTIME - gs_stScheduler.iProcessorTime;
     }
 
+    if (gs_stScheduler.qwLastFPUUsedTaskID != pstNextTask->stLink.qwID) {
+        kSetTS();
+    } else {
+        kClearTS();
+    }
+
     gs_stScheduler.iProcessorTime = TASK_PROCESSORTIME;
 
     if (pstRunningTask->qwFlags & TASK_FLAGS_ENDTASK) {
@@ -303,6 +313,12 @@ BOOL kScheduleInInterrupt() {
     }
 
     kUnlockForSystemData(bPreviousFlag);
+
+    if (gs_stScheduler.qwLastFPUUsedTaskID != pstNextTask->stLink.qwID) {
+        kSetTS();
+    } else {
+        kClearTS();
+    }
 
     kMemCpy(pcContextAddress, &pstNextTask->stContext, sizeof(CONTEXT));
 
@@ -500,4 +516,13 @@ void kHaltProcessorByLoad() {
     } else if (gs_stScheduler.qwProcessorLoad < 95) {
         kHlt();
     }
+}
+
+// FPU
+QWORD kGetLastFPUUsedTaskID() {
+    return gs_stScheduler.qwLastFPUUsedTaskID;
+}
+
+void kSetLastFPUUsedTaskID(QWORD qwTaskID) {
+    gs_stScheduler.qwLastFPUUsedTaskID = qwTaskID;
 }

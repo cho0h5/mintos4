@@ -4,6 +4,7 @@
 #include "Keyboard.h"
 #include "Console.h"
 #include "Utility.h"
+#include "AssemblyUtility.h"
 #include "Task.h"
 
 void kCommonExceptionHandler(int iVectorNumber, QWORD qwErrorCode) {
@@ -77,4 +78,42 @@ void kTimerHandler(int iVectorNumber) {
     if (kIsProcessorTimeExpired()) {
         kScheduleInInterrupt();
     }
+}
+
+void kDeviceNotAvailableHandler(int iVectorNumber) {
+    static int g_iFPUInterruptCount = 0;
+    char vcBuffer[] = "[EXC:  , ]";
+
+    // print
+    vcBuffer[5] = '0' + iVectorNumber / 10;
+    vcBuffer[6] = '0' + iVectorNumber % 10;
+    vcBuffer[8] = '0' + g_iFPUInterruptCount;
+    g_iFPUInterruptCount += 1;
+    g_iFPUInterruptCount %= 10;
+    kPrintStringXY(70, 2, vcBuffer);
+
+    // Save
+    kClearTS();
+
+    const QWORD qwLastFPUUsedTaskID = kGetLastFPUUsedTaskID();
+    TCB *pstCurrentTask = kGetRunningTask();
+
+    if (qwLastFPUUsedTaskID == pstCurrentTask->stLink.qwID) {
+        return;
+    } else if (qwLastFPUUsedTaskID != TASK_INVALIDID) {
+        TCB *pstFPUTask = kGetTCBInTCBPool(GETTCBOFFSET(qwLastFPUUsedTaskID));
+        if (pstFPUTask != NULL && pstFPUTask->stLink.qwID == qwLastFPUUsedTaskID) {
+            kSaveFPUContext(pstFPUTask->vqwFPUContext);
+        }
+    }
+
+    // Restore
+    if (!pstCurrentTask->bFPUUsed) {
+        kInitializeFPU();
+        pstCurrentTask->bFPUUsed = TRUE;
+    } else {
+        kLoadFPUContext(pstCurrentTask->vqwFPUContext);
+    }
+
+    kSetLastFPUUsedTaskID(pstCurrentTask->stLink.qwID);
 }
