@@ -708,7 +708,7 @@ static void kTestSequentialAllocation(const char *pcParameterBuffer) {
 
 static void kRandomAllocationTask() {
     const TCB *pstTask = kGetRunningTask();
-    int iY = pstTask->stLink.qwID % 15 + 9;
+    const int iY = pstTask->stLink.qwID % 15 + 9;
 
     for (int j = 0; j < 10; j++) {
         QWORD qwMemorySize;
@@ -723,11 +723,11 @@ static void kRandomAllocationTask() {
         } while (pbAllocationBuffer == NULL);
 
         char vcBuffer[200];
-        kPrintf(vcBuffer, "|Address: [0x%Q] Size: [0x%Q] Allocation Success", pbAllocationBuffer, qwMemorySize);
+        kSPrintf(vcBuffer, "|Address: [0x%Q] Size: [0x%Q] Allocation Success", pbAllocationBuffer, qwMemorySize);
         kPrintStringXY(20, iY, vcBuffer);
         kSleep(200);
 
-        kPrintf(vcBuffer, "Address: [0x%Q] Size: [0x%Q] Data Write...     ", pbAllocationBuffer, qwMemorySize);
+        kSPrintf(vcBuffer, "|Address: [0x%Q] Size: [0x%Q] Data Write...       ", pbAllocationBuffer, qwMemorySize);
         kPrintStringXY(20, iY, vcBuffer);
         for (int i = 0; i < qwMemorySize / 2; i++) {
             pbAllocationBuffer[i] = kRandom() % 0xff;
@@ -735,7 +735,7 @@ static void kRandomAllocationTask() {
         }
         kSleep(200);
 
-        kPrintf(vcBuffer, "Address: [0x%Q] Size: [0x%Q] Data Verify...     ", pbAllocationBuffer, qwMemorySize);
+        kSPrintf(vcBuffer, "|Address: [0x%Q] Size: [0x%Q] Data Verify...       ", pbAllocationBuffer, qwMemorySize);
         kPrintStringXY(20, iY, vcBuffer);
         for (int i = 0; i < qwMemorySize / 2; i++) {
             if (pbAllocationBuffer[i] != pbAllocationBuffer[i + (qwMemorySize / 2)]) {

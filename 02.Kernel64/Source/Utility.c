@@ -210,6 +210,17 @@ int kReverseString(char *pcBuffer) {
     }
 }
 
+int kSPrintf(char *pcBuffer, const char *pcFormatString, ...) {
+    va_list ap;
+    int iReturn;
+
+    va_start(ap, pcFormatString);
+    iReturn = kVSPrintf(pcBuffer, pcFormatString, ap);
+    va_end(ap);
+
+    return iReturn;
+}
+
 int kVSPrintf(char *pcBuffer, const char *pcFormatString, va_list ap) {
     int iBufferIndex = 0;
     const int iFormatLength = kStrLen(pcFormatString);
