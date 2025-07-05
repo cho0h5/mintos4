@@ -265,3 +265,17 @@ static BYTE kGetFlagInBitmap(const int iBlockListIndex, const int iOffset) {
     }
     return DYNAMICMEMORY_EMPTY;
 }
+
+// ETC
+
+void kGetDynamicMemoryInformation(QWORD *pqwDynamicMemoryStartAddress, QWORD *pqwDynamicMemoryTotalSize,
+        QWORD *pqwMetaDataSize, QWORD *pqwUsedMemorySize) {
+    *pqwDynamicMemoryStartAddress = DYNAMICMEMORY_START_ADDRESS;
+    *pqwDynamicMemoryTotalSize = kCalculateDynamicMemorySize();
+    *pqwMetaDataSize = kCalculateMetaBlockCount(*pqwDynamicMemoryTotalSize * DYNAMICMEMORY_MIN_SIZE);
+    *pqwUsedMemorySize = gs_stDynamicMemory.qwUsedSize;
+}
+
+DYNAMICMEMORY *kGetDynamicMemoryManager() {
+    return &gs_stDynamicMemory;
+}

@@ -33,13 +33,11 @@ typedef struct kDynamicMemoryManagerStruct {
 #pragma pack(pop)
 
 // Initialize
-
 void kInitializeDynamicMemory();
 static QWORD kCalculateDynamicMemorySize();
 static int kCalculateMetaBlockCount(QWORD qwDynamicRAMSize);
 
 // Allocation
-
 void *kAllocateMemory(const QWORD qwSize);
 static QWORD kGetBuddyBlockSize(const QWORD qwSize);
 static int kAllocationBuddyBlock(const QWORD qwAlignedSize);
@@ -48,9 +46,14 @@ static int kFindFreeBlockInBitmap(const int iBlockListIndex);
 static void kSetFlagInBitmap(const int iBlockListIndex, const int iOffset, const BYTE bFlag);
 
 // Deallocation
-
 BOOL kFreeMemory(const void *pvAddress);
 static BOOL kFreeBuddyBlock(const int iBlockListIndex, const int iBlockOffset);
 static BYTE kGetFlagInBitmap(const int iBlockListIndex, const int iOffset);
+
+// ETC
+
+void kGetDynamicMemoryInformation(QWORD *pqwDynamicMemoryStartAddress, QWORD *pqwDynamicMemoryTotalSize,
+        QWORD *pqwMetaDataSize, QWORD *pqwUsedMemorySize);
+DYNAMICMEMORY *kGetDynamicMemoryManager();
 
 #endif
