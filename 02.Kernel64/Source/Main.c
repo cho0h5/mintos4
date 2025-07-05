@@ -8,6 +8,7 @@
 #include "Utility.h"
 #include "PIT.h"
 #include "Task.h"
+#include "DynamicMemory.h"
 
 void Main() {
     kInitializeConsole(0, 10);
@@ -45,9 +46,15 @@ void Main() {
 
     kPrintf("[    ] TCB PoolAnd Scheduler Initialize\n");
     kInitializeScheduler();
-    kInitializePIT(MSTOCOUNT(1), 1);
     kSetCursor(1, iCursorY++);
     kPrintf("Pass\n");
+
+    kPrintf("[    ] Dynamic Memory Initialize\n");
+    kInitializeDynamicMemory();
+    kSetCursor(1, iCursorY++);
+    kPrintf("Pass\n");
+
+    kInitializePIT(MSTOCOUNT(1), 1);
 
     kPrintf("[    ] Keyboard Activate And Queue Initialize\n");
     if (kInitializeKeyboard()) {
