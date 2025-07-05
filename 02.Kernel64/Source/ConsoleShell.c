@@ -671,7 +671,7 @@ static void kTestSequentialAllocation(const char *pcParameterBuffer) {
         kPrintf("Allocation and Compare: ");
 
         // Test allocation
-        for (int j = 0; j < (pstMemory->iBlockCountOfSmallestBlock >> i); i++) {
+        for (int j = 0; j < (pstMemory->iBlockCountOfSmallestBlock >> i); j++) {
             QWORD *pqwBuffer = kAllocateMemory(DYNAMICMEMORY_MIN_SIZE << i);
             if (pqwBuffer == NULL) {
                 kPrintf("\nAllocation Fail\n");
@@ -694,7 +694,7 @@ static void kTestSequentialAllocation(const char *pcParameterBuffer) {
 
         // Test deallocation
         kPrintf("\nFree: ");
-        for (int j = 0; j < (pstMemory->iBlockCountOfSmallestBlock >> i); i++) {
+        for (int j = 0; j < (pstMemory->iBlockCountOfSmallestBlock >> i); j++) {
             if (!kFreeMemory((void *)pstMemory->qwStartAddress + (DYNAMICMEMORY_MIN_SIZE << i) * j)) {
                 kPrintf("\nFree Fail\n");
                 return;
@@ -703,7 +703,7 @@ static void kTestSequentialAllocation(const char *pcParameterBuffer) {
         }
         kPrintf("\n");
     }
-    kPrintf("Test Complete!");
+    kPrintf("Test Complete!\n");
 }
 
 static void kRandomAllocationTask() {
