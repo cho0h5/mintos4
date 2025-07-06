@@ -31,3 +31,4 @@ NASM version 2.16.03 compiled on May 13 2025
 - ch13. 링킹 중 `InterruptHandler.c`에서 `__stack_chk_fail`에러 발생
     - `02.Kernel64/Makefile`의 GCC64에 `-fno-stack-protector` 추가
 - ch24. `kWriteHDDSector`에서 `kWaitForHDDNoBusy`전에 `kLock`해야함
+- ch25. `Main`에서 `FileSystem`를 초기화하면 `HDD`를 더이상 초기화 할 필요 없음
