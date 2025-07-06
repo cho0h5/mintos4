@@ -998,4 +998,52 @@ static void kDeleteFileInRootDirectory(const char *pcParameterBuffer) {
 }
 
 static void kShowRootDirectory(const char *pcParameterBuffer) {
+    BYTE *pbClusterBuffer = kAllocateMemory(FILESYSTEM_SECTORSPERCLUSTER * 512);
+    if (!kReadCluster(0, pbClusterBuffer)) {
+        kPrintf("Root Directory Read Failed\n");
+        return;
+    }
+
+    const DIRECTORYENTRY *pstEntry = (DIRECTORYENTRY *)pbClusterBuffer;
+    int iTotalCount = 0;
+    DWORD dwTotalByte = 0;
+    for (int i = 0; i < FILESYSTEM_MAXDIRECTORYENTRYCOUNT; i++) {
+        if (pstEntry[i].dwStartClusterIndex == 0) {
+            continue;
+        }
+        iTotalCount++;
+        dwTotalByte += pstEntry[i].dwFileSize;
+    }
+
+    int iCount = 0;
+    for (int i = 0; i < FILESYSTEM_MAXDIRECTORYENTRYCOUNT; i++) {
+        if (pstEntry[i].dwStartClusterIndex == FILESYSTEM_FREECLUSTER) {
+            continue;
+        }
+
+        char vcBuffer[400];
+        kMemSet(vcBuffer, ' ', sizeof(vcBuffer) - 1);
+        vcBuffer[sizeof(vcBuffer) - 1] = '\0';
+        kMemCpy(vcBuffer, pstEntry[i].vcFileName, kStrLen(pstEntry[i].vcFileName));
+
+        char vcTempValue[50];
+        kSPrintf(vcTempValue, "%d Byte", pstEntry[i].dwFileSize);
+        kMemCpy(vcBuffer + 20, vcTempValue, kStrLen(vcTempValue));
+
+        kSPrintf(vcTempValue, "0x%X Cluster", pstEntry[i].dwStartClusterIndex);
+        kMemCpy(vcBuffer + 55, vcTempValue, kStrLen(vcTempValue) + 1);
+        kPrintf("\t%s\n", vcBuffer);
+
+        if (iCount != 0 && (iCount % 20) == 0) {
+            kPrintf("Press any key to continue... ('q' is exit): ");
+            if (kGetCh() == 'q') {
+                kPrintf("\n");
+                break;
+            }
+        }
+        iCount++;
+    }
+
+    kPrintf("\tTotal File Count: %d\t Total File Size: %d Byte\n", iTotalCount, dwTotalByte);
+    kFreeMemory(pbClusterBuffer);
 }
