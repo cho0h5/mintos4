@@ -129,7 +129,7 @@ BOOL kReadHDDInformation(const BOOL bPrimary, const BOOL bMaster, HDDINFORMATION
 
     // Receive
     for (int i = 0; i < 512 / 2; i++) {
-        ((WORD *)pstHDDInformation)[i] = kInPortByte(wPortBase + HDD_PORT_INDEX_DATA);
+        ((WORD *)pstHDDInformation)[i] = kInPortWord(wPortBase + HDD_PORT_INDEX_DATA);
     }
 
     kSwapByteInWord(pstHDDInformation->vwModelNumber, sizeof(pstHDDInformation->vwModelNumber) / 2);

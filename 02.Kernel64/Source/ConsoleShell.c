@@ -782,7 +782,7 @@ static void kShowHDDInformation(const char *pcParameterBuffer) {
     vcBuffer[sizeof(stHDD.vwSerialNumber) - 1] = '\0';
     kPrintf("Serial Number:\t%s\n", vcBuffer);
 
-    kPrintf("Head Count:\t%d\n", stHDD.wNumberOfHead);
+    kPrintf("Head Count:\t\t%d\n", stHDD.wNumberOfHead);
     kPrintf("Cylinder Count:\t%d\n", stHDD.wNumberOfCylinder);
     kPrintf("Sector Count:\t%d\n", stHDD.wNumberOfSectorPerCylinder);
     kPrintf("Total Sector:\t%d, %d MB\n", stHDD.dwTotalSectors, stHDD.dwTotalSectors / 2 / 1024);
