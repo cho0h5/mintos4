@@ -34,27 +34,42 @@ static void kCls(const char *pcParameterBuffer);
 static void kShowTotalRAMSize(const char *pcParameterBuffer);
 static void kStringToDecimalHexTest(const char *pcParameterBuffer);
 static void kShutdown(const char *pcParameterBuffer);
+
 static void kSetTimer(const char *pcParameterBuffer);
 static void kWaitUsingPIT(const char *pcParameterBuffer);
 static void kReadTimeStampCounter(const char * pcParameterBuffer);
 static void kMeasureProcessorSpeed(const char *pcParameterBuffer);
 static void kShowDateAndTime(const char *pcParameterBuffer);
+
 static void kCreateTestTask(const char *pcParameterBuffer);
 static void kChangeTaskPriority(const char *pcParameterBuffer);
 static void kShowTaskList(const char *pcParameterBuffer);
 static void kKillTask(const char *pcParameterBuffer);
 static void kCPULoad(const char *pcParameterBuffer);
+
 static void kTestMutex(const char *pcParameterBuffer);
 static void kCreateThreadTask();
 static void kTestThread(const char *pcParameterBuffer);
 static void kShowMatrix(const char *pcParameterBuffer);
 static void kTestPIE(const char *pcParameterBuffer);
+
+// Dynamic Memory
 static void kShowDynamicMemoryInformation(const char *pcParameterBuffer);
 static void kTestSequentialAllocation(const char *pcParameterBuffer);
 static void kTestRandomAllocation(const char *pbCurrentBitmapPosition);
 static void kRandomAllocationTask();
+
+// HDD Driver
 static void kShowHDDInformation(const char *pcParameterBuffer);
 static void kReadSector(const char *pcParameterBuffer);
 static void kWriteSector(const char *pcParameterBuffer);
+
+// FileSystem
+static void kMountHDD(const char *pcParameterBuffer);
+static void kFormatHDD(const char *pcParameterBuffer);
+static void kShowFileSystemInformation(const char *pcParameterBuffer);
+static void kCreateFileInRootDirectory(const char *pcParameterBuffer);
+static void kDeleteFileInRootDirectory(const char *pcParameterBuffer);
+static void kShowRootDirectory(const char *pcParameterBuffer);
 
 #endif

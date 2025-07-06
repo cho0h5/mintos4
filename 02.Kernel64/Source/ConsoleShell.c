@@ -9,6 +9,7 @@
 #include "Syncronization.h"
 #include "DynamicMemory.h"
 #include "HardDisk.h"
+#include "FileSystem.h"
 
 SHELLCOMMANENTRY gs_vstCommandTable[] = {
     {"help", "Show help", kHelp},
@@ -37,6 +38,12 @@ SHELLCOMMANENTRY gs_vstCommandTable[] = {
     {"hddinfo", "Show HDD Information", kShowHDDInformation},
     {"readsector", "Read HDD Sector, Usage: readsector 0(LBA) 10(count)", kReadSector},
     {"writesector", "Write HDD Sector, Usage: writesector 0(LBA) 10(count)", kWriteSector},
+    {"mounthdd", "Mount HDD", kMountHDD},
+    {"formathdd", "Format HDD", kFormatHDD},
+    {"filesysteminfo", "Show File System Information", kShowFileSystemInformation},
+    {"touch", "Create File. Usage: touch a.txt", kCreateFileInRootDirectory},
+    {"rm", "Delete File. Usage: rm a.txt", kDeleteFileInRootDirectory},
+    {"ls", "Show Directory", kShowRootDirectory},
 };
 
 void kStartConsoleShell() {
@@ -901,5 +908,94 @@ static void kWriteSector(const char *pcParameterBuffer) {
             break;
         }
     }
+}
 
+static void kMountHDD(const char *pcParameterBuffer) {
+}
+
+static void kFormatHDD(const char *pcParameterBuffer) {
+}
+
+static void kShowFileSystemInformation(const char *pcParameterBuffer) {
+}
+
+static void kCreateFileInRootDirectory(const char *pcParameterBuffer) {
+    char vcFileName[50];
+    PARAMETERLIST stList;
+    DIRECTORYENTRY stEntry;
+
+    // Parse args
+    kInitializeParameter(&stList, pcParameterBuffer);
+    const int iLength = kGetNextParameter(&stList, vcFileName);
+    vcFileName[iLength] = '\0';
+    if (iLength == 0 || iLength > sizeof(stEntry.vcFileName) - 1) {
+        kPrintf("Too Short or Too Long File Name\n");
+        return;
+    }
+
+    // Find free cluster
+    const DWORD dwCluster = kFindFreeCluster();
+    if (dwCluster == FILESYSTEM_LASTCLUSTER || !kSetClusterLinkData(dwCluster, FILESYSTEM_LASTCLUSTER)) {
+        kPrintf("Cluster Allocation Failed\n");
+        return;
+    }
+
+    // Find free directory entry
+    const int i = kFindFreeDirectoryEntry();
+    if (i == -1) {
+        kSetClusterLinkData(dwCluster, FILESYSTEM_FREECLUSTER);
+        kPrintf("Directory Entry is Full\n");
+        return;
+    }
+
+    // Set directory entry
+    kMemCpy(stEntry.vcFileName, vcFileName, iLength + 1);
+    stEntry.dwStartClusterIndex = dwCluster;
+    stEntry.dwFileSize = 0;
+
+    if (!kSetDirectoryEntryData(i, &stEntry)) {
+        kSetClusterLinkData(dwCluster, FILESYSTEM_FREECLUSTER);
+        kPrintf("Directory Entry Set Failed\n");
+        return;
+    }
+
+    kPrintf("File Create Success\n");
+}
+
+static void kDeleteFileInRootDirectory(const char *pcParameterBuffer) {
+    char vcFileName[50];
+    PARAMETERLIST stList;
+    DIRECTORYENTRY stEntry;
+
+    // Parse args
+    kInitializeParameter(&stList, pcParameterBuffer);
+    const int iLength = kGetNextParameter(&stList, vcFileName);
+    vcFileName[iLength] = '\0';
+    if (iLength == 0 || iLength > sizeof(stEntry.vcFileName) - 1) {
+        kPrintf("Too Short or Too Long File Name\n");
+        return;
+    }
+
+    // Find directory entry
+    const int iOffset = kFindDirectoryEntry(vcFileName, &stEntry);
+    if (iOffset == -1) {
+        kPrintf("File Not Found\n");
+        return;
+    }
+
+    if (!kSetClusterLinkData(stEntry.dwStartClusterIndex, FILESYSTEM_FREECLUSTER)) {
+        kPrintf("Cluster Free Fail\n");
+        return;
+    }
+
+    kMemSet(&stEntry, 0, sizeof(stEntry));
+    if (!kSetDirectoryEntryData(iOffset, &stEntry)) {
+        kPrintf("Root Directory Update Failed\n");
+        return;
+    }
+
+    kPrintf("File Delete Success\n");
+}
+
+static void kShowRootDirectory(const char *pcParameterBuffer) {
 }
