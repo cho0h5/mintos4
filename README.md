@@ -28,3 +28,4 @@ NASM version 2.16.03 compiled on May 13 2025
     - TSSDATA -> TSSSEGMENT
 - ch13. 링킹 중 `InterruptHandler.c`에서 `__stack_chk_fail`에러 발생
     - `02.Kernel64/Makefile`의 GCC64에 `-fno-stack-protector` 추가
+- ch24. `kWriteHDDSector`에서 `kWaitForHDDNoBusy`전에 `kLock`해야함

@@ -32,4 +32,8 @@ re:
 run: re
 	qemu-system-x86_64 \
 		-L . -m 64 -M pc \
-		-drive format=raw,file=Disk.img,if=floppy
+		-drive format=raw,file=Disk.img,if=floppy \
+		-hda HDD.img
+
+create_hdd:
+	qemu-img create HDD.img 20M

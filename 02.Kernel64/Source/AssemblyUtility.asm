@@ -8,6 +8,7 @@ global kEnableInterrupt, kDisableInterrupt, kReadRFLAGS
 global kReadTSC
 global kSwitchContext, kHlt, kTestAndSet
 global kInitializeFPU, kSaveFPUContext, kLoadFPUContext, kSetTS, kClearTS
+global kInPortWord, kOutPortWord
 
 ; Keyboard
 
@@ -211,4 +212,26 @@ kSetTS:
 
 kClearTS:
     clts
+    ret
+
+kInPortWord:
+    push rdx
+
+    mov rdx, rdi
+    mov rax, 0
+    in ax, dx
+
+    pop rdx
+    ret
+
+kOutPortWord:
+    push rdx
+    push rax
+
+    mov rdx, rdi
+    mov rax, rsi
+    out dx, ax
+
+    pop rax
+    pop rdx
     ret

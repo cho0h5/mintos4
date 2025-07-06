@@ -31,4 +31,8 @@ void kLoadFPUContext(void *pvFPUContext);
 void kSetTS();
 void kClearTS();
 
+// HDD
+WORD kInPortWord(WORD wPort);
+void kOutPortWord(WORD wPort, WORD wData);
+
 #endif

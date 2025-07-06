@@ -1,4 +1,4 @@
-Disk.img
+*.img
 *.o
 *.swp
 *.bin

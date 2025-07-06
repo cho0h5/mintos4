@@ -6,6 +6,7 @@
 #include "Utility.h"
 #include "AssemblyUtility.h"
 #include "Task.h"
+#include "HardDisk.h"
 
 void kCommonExceptionHandler(int iVectorNumber, QWORD qwErrorCode) {
     char vcBuffer[3] = { 0, };
@@ -34,7 +35,7 @@ void kCommonInterruptHandler(int iVectorNumber) {
     g_iCommonInterruptCount %= 10;
     kPrintStringXY(70, 0, vcBuffer);
 
-    kSendEOIToPIC(iVectorNumber - 32);
+    kSendEOIToPIC(iVectorNumber - PIC_IRQSTARTVECTOR);
 }
 
 void kKeyboardHandler(int iVectorNumber) {
@@ -55,7 +56,7 @@ void kKeyboardHandler(int iVectorNumber) {
         kConvertScanCodeAndPutQueue(bTemp);
     }
 
-    kSendEOIToPIC(iVectorNumber - 32);
+    kSendEOIToPIC(iVectorNumber - PIC_IRQSTARTVECTOR);
 }
 
 void kTimerHandler(int iVectorNumber) {
@@ -116,4 +117,25 @@ void kDeviceNotAvailableHandler(int iVectorNumber) {
     }
 
     kSetLastFPUUsedTaskID(pstCurrentTask->stLink.qwID);
+}
+
+void kHDDHandler(int iVectorNumber) {
+    static int g_iHDDInterruptCount = 0;
+    char vcBuffer[] = "[HDD:  , ]";
+
+    // print
+    vcBuffer[5] = '0' + iVectorNumber / 10;
+    vcBuffer[6] = '0' + iVectorNumber % 10;
+    vcBuffer[8] = '0' + g_iHDDInterruptCount;
+    g_iHDDInterruptCount += 1;
+    g_iHDDInterruptCount %= 10;
+    kPrintStringXY(70, 0, vcBuffer);
+
+    if (iVectorNumber - PIC_IRQSTARTVECTOR == 14) {
+        kSetHDDInterruptFlag(TRUE, TRUE);
+    } else {
+        kSetHDDInterruptFlag(FALSE, TRUE);
+    }
+
+    kSendEOIToPIC(iVectorNumber - PIC_IRQSTARTVECTOR);
 }
