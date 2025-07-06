@@ -1,6 +1,8 @@
 ### Issues
-- ch02. QEMU, gcc, nasm, binutil의 최신 버전을 사용해도 아직은(~ ch09) 문제가 없다
+- ch02. QEMU, gcc, nasm, binutil의 최신 버전을 사용해도 아직은(~ ch24) 문제가 없다
 ```
+Linux archlinux 6.15.3-arch1-1 #1 SMP PREEMPT_DYNAMIC Thu, 19 Jun 2025 14:41:19 +0000 x86_64 GNU/Linux
+
 qemu-x86_64 version 10.0.0
 Copyright (c) 2003-2025 Fabrice Bellard and the QEMU Project developers
 
