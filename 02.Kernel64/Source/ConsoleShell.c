@@ -843,4 +843,63 @@ static void kReadSector(const char *pcParameterBuffer) {
 }
 
 static void kWriteSector(const char *pcParameterBuffer) {
+    static DWORD s_dwWriteCount = 0;
+    char vcLBA[50];
+    char vcSectorCount[50];
+    PARAMETERLIST stList;
+
+    // Parse args
+    kInitializeParameter(&stList, pcParameterBuffer);
+    if (kGetNextParameter(&stList, vcLBA) == 0 || kGetNextParameter(&stList, vcSectorCount) == 0) {
+        kPrintf("Usage: writesector 0(LBA) 10(count)\n");
+        return;
+    }
+    const DWORD dwLBA = kAToI(vcLBA, 10);
+    const int iSectorCount = kAToI(vcSectorCount, 10);
+
+    // Prepare data
+    s_dwWriteCount++;
+    char *pcBuffer = kAllocateMemory(iSectorCount * 512);
+    for (int j = 0; j < iSectorCount; j++) {
+        for (int i = 0; i < 512; i += 8) {
+            *(DWORD *)&(pcBuffer[j * 512 + i]) = dwLBA + j;
+            *(DWORD *)&(pcBuffer[j * 512 + i + 4]) = s_dwWriteCount;
+        }
+    }
+
+    // Write
+    if (kWriteHDDSector(TRUE, TRUE, dwLBA, iSectorCount, pcBuffer) != iSectorCount) {
+        kPrintf("Write Fail\n");
+        kFreeMemory(pcBuffer);
+        return;
+    }
+    kPrintf("LBA [%d], [%d] Sector Read Success", dwLBA, iSectorCount);
+
+    BOOL bExit = FALSE;
+    for (int j = 0; j < iSectorCount; j++) {
+        for (int i = 0; i < 512; i++) {
+            if (!(j == 0 && i == 0) && (i % 256 == 0)) {
+                kPrintf("\nPress any key to continue... ('q' is exit): ");
+                if (kGetCh() == 'q') {
+                    bExit = TRUE;
+                    break;
+                }
+            }
+
+            if (i % 16 == 0) {
+                kPrintf("\n[LBA: %d, Offset: %d]\t| ", dwLBA + j, i);
+            }
+
+            const BYTE bData = pcBuffer[j * 512 + i] & 0xff;
+            if (bData < 16) {
+                kPrintf("0");
+            }
+            kPrintf("%X ", bData);
+        }
+
+        if (bExit) {
+            break;
+        }
+    }
+
 }
