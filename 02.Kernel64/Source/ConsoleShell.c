@@ -8,6 +8,7 @@
 #include "Task.h"
 #include "Syncronization.h"
 #include "DynamicMemory.h"
+#include "HardDisk.h"
 
 SHELLCOMMANENTRY gs_vstCommandTable[] = {
     {"help", "Show help", kHelp},
@@ -33,6 +34,9 @@ SHELLCOMMANENTRY gs_vstCommandTable[] = {
     {"dynamicmeminfo", "Show Dynamic Memory Information", kShowDynamicMemoryInformation},
     {"testseqalloc", "Test Sequential Allocation & Free", kTestSequentialAllocation},
     {"testranalloc", "Test Random Allocation & Free", kTestRandomAllocation},
+    {"hddinfo", "Show HDD Information", kShowHDDInformation},
+    {"readsector", "Read HDD Sector, Usage: readsector 0(LBA) 10(count)", kReadSector},
+    {"writesector", "Write HDD Sector, Usage: writesector 0(LBA) 10(count)", kWriteSector},
 };
 
 void kStartConsoleShell() {
@@ -755,4 +759,37 @@ static void kTestRandomAllocation(const char *pbCurrentBitmapPosition) {
     for (int i = 0; i < 1000; i++) {
         kCreateTask(TASK_FLAGS_LOWEST | TASK_FLAGS_THREAD, 0, 0, (QWORD)kRandomAllocationTask);
     }
+}
+
+static void kShowHDDInformation(const char *pcParameterBuffer) {
+    char vcBuffer[100];
+
+    HDDINFORMATION stHDD;
+    if (!kReadHDDInformation(TRUE, TRUE, &stHDD)) {
+        kPrintf("HDD Information Read Fail\n");
+        return;
+    }
+
+    kPrintf("==== Primary Master HDD Information ====\n");
+
+    // Print model number
+    kMemCpy(vcBuffer, stHDD.vwModelNumber, sizeof(stHDD.vwModelNumber));
+    vcBuffer[sizeof(stHDD.vwModelNumber) - 1] = '\0';
+    kPrintf("Model Number:\t%s\n", vcBuffer);
+
+    // Print serial number
+    kMemCpy(vcBuffer, stHDD.vwSerialNumber, sizeof(stHDD.vwSerialNumber));
+    vcBuffer[sizeof(stHDD.vwSerialNumber) - 1] = '\0';
+    kPrintf("Serial Number:\t%s\n", vcBuffer);
+
+    kPrintf("Head Count:\t%d\n", stHDD.wNumberOfHead);
+    kPrintf("Cylinder Count:\t%d\n", stHDD.wNumberOfCylinder);
+    kPrintf("Sector Count:\t%d\n", stHDD.wNumberOfSectorPerCylinder);
+    kPrintf("Total Sector:\t%d, %d MB\n", stHDD.dwTotalSectors, stHDD.dwTotalSectors / 2 / 1024);
+}
+
+static void kReadSector(const char *pcParameterBuffer) {
+}
+
+static void kWriteSector(const char *pcParameterBuffer) {
 }
