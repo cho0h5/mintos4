@@ -931,12 +931,12 @@ static void kShowFileSystemInformation(const char *pcParameterBuffer) {
     kGetFileSystemInformation(&stManager);
 
     kPrintf("======= File System Information ========\n");
-    kPrintf("Mounted:\t%d\n", stManager.bMounted);
-    kPrintf("Reserved Sector Count:\t%d Sector\n", stManager.dwReservedSectorCount);
-    kPrintf("Cluster Link Table Start Address:\t%dS Sector\n", stManager.dwClusterLinkAreaStartAddress);
-    kPrintf("Cluster Link Table Size:\t%d Sector\n", stManager.dwClusterLinkAreaSize);
-    kPrintf("Data Area Start Address:\t%d Sector\n", stManager.dwDataAreaStartAddress);
-    kPrintf("Total Cluster Count:\t%d Cluster\n", stManager.dwTotalClusterCount);
+    kPrintf("Mounted:\t\t\t\t\t\t\t%d\n", stManager.bMounted);
+    kPrintf("Reserved Sector Count:\t\t\t\t%d Sector\n", stManager.dwReservedSectorCount);
+    kPrintf("Cluster Link Table Start Address:\t%d Sector\n", stManager.dwClusterLinkAreaStartAddress);
+    kPrintf("Cluster Link Table Size:\t\t\t%d Sector\n", stManager.dwClusterLinkAreaSize);
+    kPrintf("Data Area Start Address:\t\t\t%d Sector\n", stManager.dwDataAreaStartAddress);
+    kPrintf("Total Cluster Count:\t\t\t\t%d Cluster\n", stManager.dwTotalClusterCount);
 
 }
 

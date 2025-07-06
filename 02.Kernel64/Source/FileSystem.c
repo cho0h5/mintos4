@@ -12,7 +12,7 @@ BOOL kInitializeFileSystem() {
     kMemSet(&gs_stFileSystemManager, 0, sizeof(gs_stFileSystemManager));
     kInitializeMutex(&gs_stFileSystemManager.stMutex);
 
-    if (kInitializeHDD() == TRUE) {
+    if (kInitializeHDD()) {
         gs_pfReadHDDInformation = kReadHDDInformation;
         gs_pfReadHDDSector = kReadHDDSector;
         gs_pfWriteHDDSector = kWriteHDDSector;

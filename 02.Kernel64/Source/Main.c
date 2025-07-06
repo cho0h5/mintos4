@@ -10,6 +10,7 @@
 #include "Task.h"
 #include "DynamicMemory.h"
 #include "HardDisk.h"
+#include "FileSystem.h"
 
 void Main() {
     kInitializeConsole(0, 10);
@@ -76,6 +77,15 @@ void Main() {
 
     kPrintf("[    ] HDD Initialize\n");
     if (kInitializeHDD()) {
+        kSetCursor(1, iCursorY++);
+        kPrintf("Pass\n");
+    } else {
+        kSetCursor(1, iCursorY++);
+        kPrintf("Fail\n");
+    }
+
+    kPrintf("[    ] File System Initialize\n");
+    if (kInitializeFileSystem()) {
         kSetCursor(1, iCursorY++);
         kPrintf("Pass\n");
     } else {
