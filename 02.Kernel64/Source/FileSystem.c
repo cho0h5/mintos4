@@ -105,6 +105,15 @@ BOOL kFormat() {
     return TRUE;
 }
 
+BOOL kGetHDDInformation(HDDINFORMATION *pstInformation) {
+    kLock(&gs_stFileSystemManager.stMutex);
+
+    const BOOL bResult = gs_pfReadHDDInformation(TRUE, TRUE, pstInformation);
+
+    kUnlock(&gs_stFileSystemManager.stMutex);
+    return bResult;
+}
+
 BOOL kReadClusterLinkTable(const DWORD dwOffset, BYTE *pbBuffer) {
     return gs_pfReadHDDSector(TRUE, TRUE, dwOffset + gs_stFileSystemManager.dwClusterLinkAreaStartAddress, 1, pbBuffer);
 }
@@ -268,4 +277,8 @@ int kFindDirectoryEntry(const char *pcFileName, DIRECTORYENTRY *pstEntry) {
         }
     }
     return -1;
+}
+
+void kGetFileSystemInformation(FILESYSTEMMANAGER *pstManager) {
+    kMemCpy(pstManager, &gs_stFileSystemManager, sizeof(gs_stFileSystemManager));
 }

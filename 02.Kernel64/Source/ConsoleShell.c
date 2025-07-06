@@ -772,7 +772,7 @@ static void kShowHDDInformation(const char *pcParameterBuffer) {
     char vcBuffer[100];
 
     HDDINFORMATION stHDD;
-    if (!kReadHDDInformation(TRUE, TRUE, &stHDD)) {
+    if (!kGetHDDInformation(&stHDD)) {
         kPrintf("HDD Information Read Fail\n");
         return;
     }
@@ -911,12 +911,33 @@ static void kWriteSector(const char *pcParameterBuffer) {
 }
 
 static void kMountHDD(const char *pcParameterBuffer) {
+    if (!kMount()) {
+        kPrintf("HDD Mount Failed\n");
+        return;
+    }
+    kPrintf("HDD Mount Success\n");
 }
 
 static void kFormatHDD(const char *pcParameterBuffer) {
+    if (!kFormat()) {
+        kPrintf("HDD Format Fail\n");
+        return;
+    }
+    kPrintf("HDD Format Success\n");
 }
 
 static void kShowFileSystemInformation(const char *pcParameterBuffer) {
+    FILESYSTEMMANAGER stManager;
+    kGetFileSystemInformation(&stManager);
+
+    kPrintf("======= File System Information ========\n");
+    kPrintf("Mounted:\t%d\n", stManager.bMounted);
+    kPrintf("Reserved Sector Count:\t%d Sector\n", stManager.dwReservedSectorCount);
+    kPrintf("Cluster Link Table Start Address:\t%dS Sector\n", stManager.dwClusterLinkAreaStartAddress);
+    kPrintf("Cluster Link Table Size:\t%d Sector\n", stManager.dwClusterLinkAreaSize);
+    kPrintf("Data Area Start Address:\t%d Sector\n", stManager.dwDataAreaStartAddress);
+    kPrintf("Total Cluster Count:\t%d Cluster\n", stManager.dwTotalClusterCount);
+
 }
 
 static void kCreateFileInRootDirectory(const char *pcParameterBuffer) {

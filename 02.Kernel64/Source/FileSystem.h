@@ -68,6 +68,7 @@ typedef struct kFileSystemManagerStruct {
 BOOL kInitializeFileSystem();
 BOOL kMount();
 BOOL kFormat();
+BOOL kGetHDDInformation(HDDINFORMATION *pstInformation);
 BOOL kReadClusterLinkTable(const DWORD dwOffset, BYTE *pbBuffer);
 BOOL kWriteClusterLinkTable(const DWORD dwOffset, const BYTE *pbBuffer);
 DWORD kFindFreeCluster();
@@ -79,5 +80,6 @@ int kFindFreeDirectoryEntry();
 BOOL kSetDirectoryEntryData(const int iIndex, const DIRECTORYENTRY *pstEntry);
 BOOL kGetDirectoryEntryData(const int iIndex, DIRECTORYENTRY *pstEntry);
 int kFindDirectoryEntry(const char *pcFileName, DIRECTORYENTRY *pstEntry);
+void kGetFileSystemInformation(FILESYSTEMMANAGER *pstManager);
 
 #endif
