@@ -49,7 +49,28 @@ typedef struct kDirectoryEntryStruct {
     DWORD dwStartClusterIndex;
 } DIRECTORYENTRY;
 
-#pragma pack(pop)
+typedef struct kFileHandleStruct {
+    int iDirectoryEntryOffset;
+    DWORD dwFileSize;
+    DWORD dwStartClusterIndex;
+    DWORD dwCurrentClusterIndex;
+    DWORD dwPreviousClusterIndex;
+    DWORD dwCurrentOffset;
+} FILEHANDLE;
+
+typedef struct kDirectoryHandleStruct {
+    DIRECTORYENTRY *pstDirectoryBuffer;
+    int iCurrentOffset;
+} DIRECTORYHANDLE;
+
+typedef struct kFileDirectoryHandleStruct {
+    BYTE bType;
+
+    union {
+        FILEHANDLE stFileHandle;
+        DIRECTORYHANDLE stDirectoryHandle;
+    };
+} FILE, DIR;
 
 typedef struct kFileSystemManagerStruct {
     BOOL bMounted;
@@ -64,6 +85,8 @@ typedef struct kFileSystemManagerStruct {
 
     MUTEX stMutex;
 } FILESYSTEMMANAGER;
+
+#pragma pack(pop)
 
 BOOL kInitializeFileSystem();
 BOOL kMount();
