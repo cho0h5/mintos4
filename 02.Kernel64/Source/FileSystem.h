@@ -11,7 +11,18 @@
 #define FILESYSTEM_FREECLUSTER              0x00
 #define FILESYSTEM_MAXDIRECTORYENTRYCOUNT   ((FILESYSTEM_SECTORSPERCLUSTER * 512) / sizeof(DIRECTORYENTRY))
 #define FILESYSTEM_CLUSTERSIZE              (FILESYSTEM_SECTORSPERCLUSTER * 512)
+
+#define FILESYSTEM_HANDLE_MAXCOUNT          (TASK_MAXCOUNT * 3)
+
 #define FILESYSTEM_MAXFILENAMELENGTH        24
+
+#define FILESYSTEM_TYPE_FREE                0
+#define FILESYSTEM_TYPE_FILE                1
+#define FILESYSTEM_TYPE_DIRECTORY           2
+
+#define FILESYSTEM_SEEK_SET                 0
+#define FILESYSTEM_SEEK_CUR                 1
+#define FILESYSTEM_SEEK_END                 2
 
 typedef BOOL (*fReadHDDInformation)(const BOOL bPrimary, const BOOL bMaster,
         HDDINFORMATION *pstHDDInformation);
@@ -86,12 +97,16 @@ typedef struct kFileSystemManagerStruct {
     DWORD dwLastAllocatedClusterLinkSectorOffset;   // Unit: Sector, For optimization
 
     MUTEX stMutex;
+
+    FILE *pstHandlePool;
 } FILESYSTEMMANAGER;
 
 BOOL kInitializeFileSystem();
 BOOL kMount();
 BOOL kFormat();
 BOOL kGetHDDInformation(HDDINFORMATION *pstInformation);
+
+// Low Level Function
 BOOL kReadClusterLinkTable(const DWORD dwOffset, BYTE *pbBuffer);
 BOOL kWriteClusterLinkTable(const DWORD dwOffset, const BYTE *pbBuffer);
 DWORD kFindFreeCluster();
@@ -104,5 +119,7 @@ BOOL kSetDirectoryEntryData(const int iIndex, const DIRECTORYENTRY *pstEntry);
 BOOL kGetDirectoryEntryData(const int iIndex, DIRECTORYENTRY *pstEntry);
 int kFindDirectoryEntry(const char *pcFileName, DIRECTORYENTRY *pstEntry);
 void kGetFileSystemInformation(FILESYSTEMMANAGER *pstManager);
+
+// High Level Function
 
 #endif

@@ -24,6 +24,14 @@ BOOL kInitializeFileSystem() {
         return FALSE;
     }
 
+    gs_stFileSystemManager.pstHandlePool = (FILE *)kAllocateMemory(FILESYSTEM_HANDLE_MAXCOUNT * sizeof(FILE));
+    if (gs_stFileSystemManager.pstHandlePool == NULL) {
+        gs_stFileSystemManager.bMounted = FALSE;
+        return TRUE;
+    }
+
+    kMemSet(gs_stFileSystemManager.pstHandlePool, 0, FILESYSTEM_HANDLE_MAXCOUNT * sizeof(FILE));
+
     return TRUE;
 }
 
@@ -281,4 +289,135 @@ int kFindDirectoryEntry(const char *pcFileName, DIRECTORYENTRY *pstEntry) {
 
 void kGetFileSystemInformation(FILESYSTEMMANAGER *pstManager) {
     kMemCpy(pstManager, &gs_stFileSystemManager, sizeof(gs_stFileSystemManager));
+}
+
+static void *kAllocateFileDirectoryHandle() {
+    File *pstFile = gs_stFileSystemManager.pstHandlePool;
+    for (int i = 0; i <FILESYSTEM_HANDLE_MAXCOUNT; i++) {
+        if (pstFile-bType == FILESYSTEM_TYPE_FILE) {
+            pstFile->bType = FILESYSTEM_TYPE_FILE;
+            return pstFile;
+        }
+
+        pstFile++;
+    }
+
+    return NULL;
+}
+
+static void kFreeFileDirectoryHandle(File *pstFile) {
+    kMemSet(pstFile, 0, sizeof(FILE));
+    pstFile->bType = FILESYSTEM_TYPE_FREE;
+}
+
+static BOOL kCreateFile(const char *pcFileName, DIRECTORYENTRY *pstEntry, int *piDirectoryEntryIndex) {
+    // Find free cluster
+    const DWORD dwCluster = kFindFreeCluster();
+    if (dwCluster == FILESYSTEM_LASTCLUSTER || !kSetClusterLinkData(dwCluster, FILESYSTEM_LASTCLUSTER)) {
+        return FALSE;
+    }
+
+    // Find free directory entry
+    *piDirectoryEntryIndex = kFindFreeDirectoryEntry();
+    if (*piDirectoryEntryIndex == -1) {
+        kSetClusterLinkData(dwCluster, FILESYSTEM_FREECLUSTER);
+        return FALSE;
+    }
+
+    // Set directory entry
+    kMemCpy(stEntry.vcFileName, pcFileName, kStrLen(pcFileName) + 1);
+    stEntry.dwStartClusterIndex = dwCluster;
+    stEntry.dwFileSize = 0;
+
+    if (!kSetDirectoryEntryData(*piDirectoryEntryIndex, pstEntry)) {
+        kSetClusterLinkData(dwCluster, FILESYSTEM_FREECLUSTER);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+static BOOL kFreeClusterUntilEnd(const DWORD dwClusterIndex) {
+    DWORD dwCurrentClusterIndex = dwClusterIndex;
+
+    while (dwCurrentClusterIndex != FILESYSTEM_LASTCLUSTER) {
+        DWORD dwNextClusterIndex;
+        if (!kGetClusterLinkData(dwCurrentClusterIndex, &dwNextClusterIndex)) {
+            return FALSE;
+        }
+
+        if (!kSetClusterLinkData(dwCurrentClusterIndex, FILESYSTEM_FREECLUSTER)) {
+            return FALSE;
+        }
+
+        dwCurrentClusterIndex = dwNextClusterIndex;
+    }
+
+    return TRUE;
+}
+
+FILE *kOpenFile(const char *pcFileName, const char *pcMode) {
+    const int iFileNameLength = kStrLen(pcFileName);
+    DIRECTORYENTRY stEntry;
+    if (iFileNameLength == 0 || iFileNameLength > sizeof(stEntry.vcfileName) - 1) {
+        return NULL;
+    }
+
+    kLock(&gs_stFileSystemManager.stMutex);
+
+    const int iDirectoryEntryOffset = kFindDirectoryEntry(pcFileName, &stEntry);
+    if (iDirectoryEntryOffset == -1) {
+        if (pcMode[0] == 'r') {
+            kUnlock(&gs_stFileSystemManager.stMutex);
+            return NULL;
+        }
+
+        if (!kCreateFile(pcFileName, &stEntry, &iDirectoryEntryOffset)) {
+            kUnlock(&gs_stFileSystemManager.stMutex);
+            return NULL;
+        }
+    } else if (pcMode[0] == 'w') {
+        DWORD dwSecondCluster;
+        if (!kGetClusterLinkData(stEntry.dwStartClusterIndex, &dwSecondCluster)) {
+            kUnlock(&gs_stFileSystemManager.stMutex);
+            return NULL;
+        }
+
+        if (!kSetClusterLinkData(stEntry.dwStartClusterIndex, FILESYSTEM_LASTCLUSTER)) {
+            kUnlock(&gs_stFileSystemManager.stMutex);
+            return NULL;
+        }
+
+        if (!kFreeClusterUntilEnd(dwSecondCluster)) {
+            kUnlock(&gs_stFileSystemManager.stMutex);
+            return NULL;
+        }
+
+        stEntry.dwFileSize = 0;
+        if (!kSetDirectoryEntryData(iDirectoryEntryOffset, &stEntry)) {
+            kUnlock(&gs_stFileSystemManager.stMutex);
+            return NULL;
+        }
+    }
+
+    FILE *pstFile = kAllocateFileDirectoryHandle();
+    if (pstFile == NULL) {
+        kUnlock(&gs_stFileSystemManager.stMutex);
+        return NULL;
+    }
+
+    pstFile->bType = FILESYSTEM_TYPE_FILE;
+    pstFile->stFileHandle.iDirectoryEntryOffset = iDirectoryEntryOffset;
+    pstFile->stFileHandle.dwFileSize = stEntry.dwFileSize;
+    pstFile->stFileHandle.dwStartClusterIndex = stEntry.dwStartClusterIndex;
+    pstFile->stFileHandle.dwCurrentClusterIndex = stEntry.dwStartClusterIndex;
+    pstFile->stFileHandle.dwPreviousClusterIndex = stEntry.dwStartClusterIndex;
+    pstFile->stFileHandle.dwCurrentOffset = 0;
+
+    if (pcMode[0] == 'a') {
+        kSeekFile(pstFile, 0, FILESYSTEM_SEEK_END);
+    }
+
+    kUnlock(&gs_stFileSystemManager.stMutex);
+    return pstFile;
 }
