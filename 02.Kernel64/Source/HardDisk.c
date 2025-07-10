@@ -180,7 +180,7 @@ int kReadHDDSector(const BOOL bPrimary, const BOOL bMaster, const DWORD dwLBA,
     } else {
         bDriveFlag = HDD_DRIVEANDHEAD_LBA | HDD_DRIVEANDHEAD_SLAVE;
     }
-    kOutPortByte(wPortBase + HDD_PORT_INDEX_DRIVEANDHEAD, bDriveFlag | (dwLBA >> 24) & 0x0f);
+    kOutPortByte(wPortBase + HDD_PORT_INDEX_DRIVEANDHEAD, bDriveFlag | ((dwLBA >> 24) & 0x0f));
 
     // Send a command
     if (!kWaitForHDDReady(bPrimary)) {
@@ -253,7 +253,7 @@ int kWriteHDDSector(const BOOL bPrimary, const BOOL bMaster, const DWORD dwLBA,
     } else {
         bDriveFlag = HDD_DRIVEANDHEAD_LBA | HDD_DRIVEANDHEAD_SLAVE;
     }
-    kOutPortByte(wPortBase + HDD_PORT_INDEX_DRIVEANDHEAD, bDriveFlag | (dwLBA >> 24) & 0x0f);
+    kOutPortByte(wPortBase + HDD_PORT_INDEX_DRIVEANDHEAD, bDriveFlag | ((dwLBA >> 24) & 0x0f));
 
     // Send a command
     if (!kWaitForHDDReady(bPrimary)) {

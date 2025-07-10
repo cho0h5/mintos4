@@ -1090,7 +1090,7 @@ static void kWriteDataToFile(const char *pcParameterBuffer) {
         kPrintf("%c", bKey);
         if (fwrite(&bKey, 1, 1, fp) != 1) {
             kPrintf("File Write Failed\n");
-            break;;
+            break;
         }
     }
 

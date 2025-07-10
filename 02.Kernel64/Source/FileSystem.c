@@ -423,6 +423,8 @@ FILE *kOpenFile(const char *pcFileName, const char *pcMode) {
     return pstFile;
 }
 
+#include "Console.h"
+
 DWORD kReadFile(void *pvBuffer, const DWORD dwSize, const DWORD dwCount, FILE *pstFile) {
     if (pstFile == NULL || pstFile->bType != FILESYSTEM_TYPE_FILE) {
         return 0;
@@ -437,6 +439,8 @@ DWORD kReadFile(void *pvBuffer, const DWORD dwSize, const DWORD dwCount, FILE *p
     const DWORD dwTotalCount = MIN(dwSize * dwCount, pstFileHandle->dwFileSize - pstFileHandle->dwCurrentOffset);
 
     kLock(&gs_stFileSystemManager.stMutex);
+
+    // kPrintf("asdfasdf: %d\n", pstFileHandle->dwCurrentClusterIndex);
 
     DWORD dwReadCount = 0;
     while (dwReadCount != dwTotalCount) {
@@ -504,7 +508,7 @@ DWORD kWriteFile(const void *pvBuffer, const DWORD dwSize, const DWORD dwCount, 
         }
 
         const DWORD dwOffsetInCluster = pstFileHandle->dwCurrentOffset % FILESYSTEM_CLUSTERSIZE;
-        const DWORD dwCopySize = MIN(FILESYSTEM_CLUSTERSIZE - dwOffsetInCluster, dwTotalCount - dwCopySize);
+        const DWORD dwCopySize = MIN(FILESYSTEM_CLUSTERSIZE - dwOffsetInCluster, dwTotalCount - dwWriteCount);
         kMemCpy(gs_vbTempBuffer + dwOffsetInCluster, (char *)pvBuffer + dwWriteCount, dwCopySize);
 
         if (!kWriteCluster(pstFileHandle->dwCurrentClusterIndex, gs_vbTempBuffer)) {
