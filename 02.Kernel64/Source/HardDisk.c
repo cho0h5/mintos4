@@ -195,7 +195,7 @@ int kReadHDDSector(const BOOL bPrimary, const BOOL bMaster, const DWORD dwLBA,
     int i = 0;
     for (; i < iSectorCount; i++) {
         const BYTE bStatus = kReadHDDStatus(bPrimary);
-        if ((bStatus & HDD_STATUS_DATAREQUEST) == HDD_STATUS_ERROR) {
+        if ((bStatus & HDD_STATUS_ERROR) == HDD_STATUS_ERROR) {
             kPrintf("Error Occur\n");
             kUnlock(&gs_stHDDManager.stMutex);
             return i;
