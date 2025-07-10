@@ -24,6 +24,24 @@
 #define FILESYSTEM_SEEK_CUR                 1
 #define FILESYSTEM_SEEK_END                 2
 
+#define fopen                               kOpenFile
+#define fread                               kReadFile
+#define fwrite                              kWriteFile
+#define fseek                               kSeekFile
+#define fclose                              kCloseFile
+#define remove                              kRemoveFile
+#define opendir                             kOpenDirectory
+#define readdir                             kReadDirectory
+#define rewinddir                           kRewindDirectory
+#define closedir                            kCloseDirectory
+
+#define SEEK_SET                            FILESYSTEM_SEEK_SET
+#define SEEK_CUR                            FILESYSTEM_SEEK_CUR
+#define SEEK_END                            FILESYSTEM_SEEK_END
+
+#define dirent                              kDirectoryEntryStruct
+#define d_name                              vcFileName
+
 typedef BOOL (*fReadHDDInformation)(const BOOL bPrimary, const BOOL bMaster,
         HDDINFORMATION *pstHDDInformation);
 typedef int (*fReadHDDSector)(const BOOL bPrimary, const BOOL bMaster,
@@ -63,12 +81,12 @@ typedef struct kDirectoryEntryStruct {
 #pragma pack(pop)
 
 typedef struct kFileHandleStruct {
-    int iDirectoryEntryOffset;
-    DWORD dwFileSize;
-    DWORD dwStartClusterIndex;
-    DWORD dwCurrentClusterIndex;
-    DWORD dwPreviousClusterIndex;
-    DWORD dwCurrentOffset;
+    int iDirectoryEntryOffset;      // Directory Entry Offset
+    DWORD dwFileSize;               // File Size                Unit: Byte
+    DWORD dwStartClusterIndex;      // Start Cluster Index      Unit: Cluster
+    DWORD dwCurrentClusterIndex;    // Current Cluster Index    Unit: Cluster
+    DWORD dwPreviousClusterIndex;   // Previous Cluster Index   Unit: Cluster
+    DWORD dwCurrentOffset;          // Current Offset           Unit: Byte
 } FILEHANDLE;
 
 typedef struct kDirectoryHandleStruct {
@@ -121,5 +139,23 @@ int kFindDirectoryEntry(const char *pcFileName, DIRECTORYENTRY *pstEntry);
 void kGetFileSystemInformation(FILESYSTEMMANAGER *pstManager);
 
 // High Level Function
+FILE *kOpenFile(const char *pcFileName, const char *pcMode);
+DWORD kReadFile(void *pvBuffer, const DWORD dwSize, const DWORD dwCount, FILE *pstFile);
+DWORD kWriteFile(const void *pvBuffer, const DWORD dwSize, const DWORD dwCount, FILE *pstFile);
+int kSeekFile(FILE *pstFile, const int iOffset, const int iOrigin);
+int kCloseFile(FILE *pstFile);
+int kRemoveFile(const char *pcFileName);
+DIR *kOpenDirectory(const char *pcDirectoryName);
+struct kDirectoryEntryStruct *kReadDirectory(DIR *pstDirectory);
+void kRewindDirectory(DIR *pstDirectory);
+int kCloseDirectory(DIR *pstDirectory);
+BOOL kWriteZero(FILE *pstFile, const DWORD dwCount);
+BOOL kIsFileOpened(const DIRECTORYENTRY *pstEntry);
+
+static void *kAllocateFileDirectoryHandle();
+static void kFreeFileDirectoryHandle(FILE *pstFile);
+static BOOL kCreateFile(const char *pcFileName, DIRECTORYENTRY *pstEntry, int *piDirectoryEntryIndex);
+static BOOL kFreeClusterUntilEnd(const DWORD dwClusterIndex);
+static BOOL kUpdateDirectoryEntry(const FILEHANDLE *pstFileHandle);
 
 #endif

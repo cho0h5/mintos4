@@ -32,3 +32,5 @@ NASM version 2.16.03 compiled on May 13 2025
     - `02.Kernel64/Makefile`의 GCC64에 `-fno-stack-protector` 추가
 - ch24. `kWriteHDDSector`에서 `kWaitForHDDNoBusy`전에 `kLock`해야함
 - ch25. `Main`에서 `FileSystem`를 초기화하면 `HDD`를 더이상 초기화 할 필요 없음
+- ch26. 1082쪽 `kOpenDirectory`구현의 두번째 if에서 `pstDirectory`가 아니라 `pstDirectoryBuffer`를 NULL검사 해야함
+- ch26. `FileSystem.h`에서 `size_t`를 정의하면 컴파일 에러 발생하여 정의하지 않음
