@@ -700,7 +700,7 @@ int kRemoveFile(const char *pcFileName) {
         return -1;
     }
 
-    if (!kIsFileOpened(&stEntry)) {
+    if (kIsFileOpened(&stEntry)) {
         kUnlock(&gs_stFileSystemManager.stMutex);
         return -1;
     }

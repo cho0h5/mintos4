@@ -1267,7 +1267,7 @@ static void kTestFileIO(const char *pcParameterBuffer) {
     kPrintf("7. Sequential Write, Read and Verify Test(1024 Byte)...\n");
 
     fseek(pstFile, -dwMaxFileSize, SEEK_CUR);
-    for (int i = 0; i < 2 * 1024 * 1024; i++) {
+    for (int i = 0; i < 2 * 1024; i++) {
         kPrintf("\t[%d] Offset [%d] Write...", i, i * 1024, 1024);
 
         if (fwrite(pbBuffer + i * 1024, 1, 1024, pstFile) != 1024) {
