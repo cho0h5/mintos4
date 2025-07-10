@@ -1034,7 +1034,7 @@ static void kShowRootDirectory(const char *pcParameterBuffer) {
         kMemCpy(vcBuffer + 30, vcTempValue, kStrLen(vcTempValue));
 
         kSPrintf(vcTempValue, "0x%X Cluster", pstEntry->dwStartClusterIndex);
-        kMemCpy(vcBuffer + 55, vcTempValue, kStrLen(vcTempValue));
+        kMemCpy(vcBuffer + 55, vcTempValue, kStrLen(vcTempValue) + 1);
         kPrintf("\t%s\n", vcBuffer);
 
         if (iCount != 0 && iCount % 20 == 0) {

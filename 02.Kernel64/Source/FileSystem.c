@@ -440,7 +440,7 @@ DWORD kReadFile(void *pvBuffer, const DWORD dwSize, const DWORD dwCount, FILE *p
 
     DWORD dwReadCount = 0;
     while (dwReadCount != dwTotalCount) {
-        if (kReadCluster(pstFileHandle->dwCurrentClusterIndex, gs_vbTempBuffer)) {
+        if (!kReadCluster(pstFileHandle->dwCurrentClusterIndex, gs_vbTempBuffer)) {
             break;
         }
 
@@ -746,7 +746,7 @@ DIR *kOpenDirectory(const char *pcDirectoryName) {
     pstDirectory->stDirectoryHandle.pstDirectoryBuffer = pstDirectoryBuffer;
 
     kUnlock(&gs_stFileSystemManager.stMutex);
-    return 0;
+    return pstDirectory;
 }
 
 struct kDirectoryEntryStruct *kReadDirectory(DIR *pstDirectory) {
