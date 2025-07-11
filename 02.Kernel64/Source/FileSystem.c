@@ -2,6 +2,7 @@
 #include "Utility.h"
 #include "DynamicMemory.h"
 #include "Console.h"
+#include "RAMDisk.h"
 
 static FILESYSTEMMANAGER gs_stFileSystemManager;
 static BYTE gs_vbTempBuffer[FILESYSTEM_SECTORSPERCLUSTER * 512];
@@ -22,6 +23,14 @@ BOOL kInitializeFileSystem() {
         gs_pfWriteHDDSector = kWriteHDDSector;
 
         bCacheEnable = TRUE;
+    } else if (kInitializeRDD(RDD_TOTALSECTORCOUNT)) {
+        gs_pfReadHDDInformation = kReadRDDInformation;
+        gs_pfReadHDDSector = kReadRDDSector;
+        gs_pfWriteHDDSector = kWriteRDDSector;
+
+        if (kFormat() == FALSE) {
+            return FALSE;
+        }
     } else {
         return FALSE;
     }
