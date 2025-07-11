@@ -35,3 +35,12 @@ NASM version 2.16.03 compiled on May 13 2025
 - ch26. 1082쪽 `kOpenDirectory`구현의 두번째 if에서 `pstDirectory`가 아니라 `pstDirectoryBuffer`를 NULL검사 해야함
 - ch26. `FileSystem.h`에서 `size_t`를 정의하면 컴파일 에러 발생하여 정의하지 않음
 - ch26. 저자 코드도 `testfileio`에서 `Interrupt Not Occur`가 종종 발생하고 일부 테스트케이스에서 Fail 발생함
+
+### TODO
+- ch27. 버블소트를 퀵소트로 교체하기
+- `ConsoleShell.c`에서 `kReadHDDSector`를 `gs_pfReadHDDSector`로 바꾸기
+- Rust로 High level부터 교체하기
+    - 더 확실하게 개념 이해하고
+    - 못 고친 부분 찾고
+    - 코드 가독성, 성능 개선하기
+    - ConsoleShell -> Cache -> FileSystem -> HardDisk -> ...

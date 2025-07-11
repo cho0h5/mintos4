@@ -4,6 +4,7 @@
 #include "Types.h"
 #include "Syncronization.h"
 #include "HardDisk.h"
+#include "CacheManager.h"
 
 #define FILESYSTEM_SIGNATURE                0xb300cf54
 #define FILESYSTEM_SECTORSPERCLUSTER        8
@@ -117,6 +118,8 @@ typedef struct kFileSystemManagerStruct {
     MUTEX stMutex;
 
     FILE *pstHandlePool;
+
+    BOOL bCacheEnable;
 } FILESYSTEMMANAGER;
 
 BOOL kInitializeFileSystem();
@@ -137,6 +140,19 @@ BOOL kSetDirectoryEntryData(const int iIndex, const DIRECTORYENTRY *pstEntry);
 BOOL kGetDirectoryEntryData(const int iIndex, DIRECTORYENTRY *pstEntry);
 int kFindDirectoryEntry(const char *pcFileName, DIRECTORYENTRY *pstEntry);
 void kGetFileSystemInformation(FILESYSTEMMANAGER *pstManager);
+
+// Cache
+static BOOL kInternalReadClusterLinkTableWithoutCache(const DWORD dwOffset, BYTE *pbBuffer);
+static BOOL kInternalReadClusterLinkTableWithCache(const DWORD dwOffset, BYTE *pbBuffer);
+static BOOL kInternalWriteClusterLinkTableWithoutCache(const DWORD dwOffset, const BYTE *pbBuffer);
+static BOOL kInternalWriteClusterLinkTableWithCache(const DWORD dwOffset, const BYTE *pbBuffer);
+static BOOL kInternalReadClusterWithoutCache(const DWORD dwOffset, BYTE *pbBuffer);
+static BOOL kInternalReadClusterWithCache(const DWORD dwOffset, BYTE *pbBuffer);
+static BOOL kInternalWriteClusterWithoutCache(const DWORD dwOffset, const BYTE *pbBuffer);
+static BOOL kInternalWriteClusterWithCache(const DWORD dwOffset, const BYTE *pbBuffer);
+
+static CACHEBUFFER *kAllocateCacheBufferWithFlush(const int iCacheTableIndex);
+BOOL kFlushFileSystemCache();
 
 // High Level Function
 FILE *kOpenFile(const char *pcFileName, const char *pcMode);
