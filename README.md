@@ -38,7 +38,6 @@ NASM version 2.16.03 compiled on May 13 2025
 
 ### TODO
 - ch27. 버블소트를 퀵소트로 교체하기
-- `ConsoleShell.c`에서 `kReadHDDSector`를 `gs_pfReadHDDSector`로 바꾸기
 - Rust로 High level부터 교체하기
     - 더 확실하게 개념 이해하고
     - 못 고친 부분 찾고
