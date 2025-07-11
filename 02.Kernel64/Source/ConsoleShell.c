@@ -1157,8 +1157,9 @@ static void kTestFileIO(const char *pcParameterBuffer) {
     if (pstFile == NULL) {
         kPrintf("[Pass]\n");
     } else {
-        kPrintf("[Fail]\n");
+        kPrintf("[Fail] 1\n");
         fclose(pstFile);
+        return;
     }
 
     // Test2
@@ -1168,7 +1169,8 @@ static void kTestFileIO(const char *pcParameterBuffer) {
         kPrintf("[Pass]\n");
         kPrintf("\tFile Handle [0x%Q]\n", pstFile);
     } else {
-        kPrintf("[Fail]\n");
+        kPrintf("[Fail] 2\n");
+        return;
     }
 
     // Test3
@@ -1177,9 +1179,9 @@ static void kTestFileIO(const char *pcParameterBuffer) {
     for (; i < 100; i++) {
         kMemSet(pbBuffer, i, FILESYSTEM_CLUSTERSIZE);
         if (fwrite(pbBuffer, 1, FILESYSTEM_CLUSTERSIZE, pstFile) != FILESYSTEM_CLUSTERSIZE) {
-            kPrintf("[Fail]\n");
+            kPrintf("[Fail] 3\n");
             kPrintf("\t%d Cluster Error\n", i);
-            break;
+            return;
         }
     }
     if (i >= 100) {
@@ -1192,15 +1194,15 @@ static void kTestFileIO(const char *pcParameterBuffer) {
 
     for (int i = 0; i < 100; i++) {
         if (fread(pbBuffer, 1, FILESYSTEM_CLUSTERSIZE, pstFile) != FILESYSTEM_CLUSTERSIZE) {
-            kPrintf("[Fail]\n");
+            kPrintf("[Fail] 4 - 1\n");
             return;
         }
 
         for (int j = 0; j < FILESYSTEM_CLUSTERSIZE; j++) {
             if (pbBuffer[j] != (BYTE)i) {
-                kPrintf("[Fail]\n");
+                kPrintf("[Fail] 4 - 2\n");
                 kPrintf("\t%d Cluster Error. [%X] != [%X]\n", i, pbBuffer[j], (BYTE)i);
-                break;
+                return;
             }
         }
     }
@@ -1225,8 +1227,8 @@ static void kTestFileIO(const char *pcParameterBuffer) {
         kMemSet(vbTempBuffer, i, dwByteCount);
 
         if (fwrite(vbTempBuffer, 1, dwByteCount, pstFile) != dwByteCount) {
-            kPrintf("[Fail]\n");
-            break;
+            kPrintf("[Fail] 5\n");
+            return;
         } else {
             kPrintf("[Pass]\n");
         }
@@ -1249,15 +1251,15 @@ static void kTestFileIO(const char *pcParameterBuffer) {
         fseek(pstFile, dwRandomOffset, SEEK_SET);
 
         if (fread(vbTempBuffer, 1, dwByteCount, pstFile) != dwByteCount) {
-            kPrintf("[Fail]\n");
+            kPrintf("[Fail] 6 - 1\n");
             kPrintf("\tRead Fail\n", dwRandomOffset);
-            break;
+            return;
         }
 
         if (kMemCmp(pbBuffer + dwRandomOffset, vbTempBuffer, dwByteCount) != 0) {
-            kPrintf("[Fail]\n");
+            kPrintf("[Fail] 6 - 2\n");
             kPrintf("\tCompare Fail\n", dwRandomOffset);
-            break;
+            return;
         }
 
         kPrintf("[Pass]\n");
@@ -1271,7 +1273,7 @@ static void kTestFileIO(const char *pcParameterBuffer) {
         kPrintf("\t[%d] Offset [%d] Write...", i, i * 1024, 1024);
 
         if (fwrite(pbBuffer + i * 1024, 1, 1024, pstFile) != 1024) {
-            kPrintf("[Fail]\n");
+            kPrintf("[Fail] 7 - 1\n");
             return;
         } else {
             kPrintf("[Pass]\n");
@@ -1284,13 +1286,13 @@ static void kTestFileIO(const char *pcParameterBuffer) {
 
         char vbTempBuffer[1024];
         if (fread(vbTempBuffer, 1, 1024, pstFile) != 1024) {
-            kPrintf("[Fail]\n");
+            kPrintf("[Fail] 7 - 2\n");
             return;
         }
 
         if (kMemCmp(pbBuffer + i * 1024, vbTempBuffer, 1024) != 0) {
-            kPrintf("[Fail]\n");
-            break;
+            kPrintf("[Fail] 7 - 3\n");
+            return;
         } else {
             kPrintf("[Pass]\n");
         }
@@ -1301,7 +1303,8 @@ static void kTestFileIO(const char *pcParameterBuffer) {
     if (remove("testfileio.bin") != 0) {
         kPrintf("[Pass]\n");
     } else {
-        kPrintf("[Fail]\n");
+        kPrintf("[Fail] 8\n");
+        return;
     }
 
     // Test9
@@ -1309,7 +1312,8 @@ static void kTestFileIO(const char *pcParameterBuffer) {
     if (fclose(pstFile) == 0) {
         kPrintf("[Pass]\n");
     } else {
-        kPrintf("[Fail]\n");
+        kPrintf("[Fail] 9\n");
+        return;
     }
 
     // Test10
@@ -1317,7 +1321,8 @@ static void kTestFileIO(const char *pcParameterBuffer) {
     if (remove("testfileio.bin") == 0) {
         kPrintf("[Pass]\n");
     } else {
-        kPrintf("[Fail]\n");
+        kPrintf("[Fail] 10\n");
+        return;
     }
 
     kFreeMemory(pbBuffer);
