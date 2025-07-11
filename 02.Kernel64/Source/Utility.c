@@ -4,25 +4,74 @@
 volatile QWORD g_qwTickCount = 0;
 
 void kMemSet(void *pvDestination, BYTE bData, int iSize) {
-    for (int i = 0; i < iSize; i++) {
-        ((char *)pvDestination)[i] = bData;
+    // for (int i = 0; i < iSize; i++) {
+    //     ((char *)pvDestination)[i] = bData;
+    // }
+
+    QWORD qwData = 0;
+    for (int i = 0; i < 8; i++) {
+        qwData = (qwData << 8) | bData;
+    }
+
+    int i = 0;
+    for (; i < iSize / 8; i++) {
+        ((QWORD *)pvDestination)[i] = qwData;
+    }
+
+    int iRemainByteStartOffset = i * 8;
+    for (int i = 0; i < iSize % 8; i++) {
+        ((char *)pvDestination)[iRemainByteStartOffset++] = bData;
     }
 }
 
 int kMemCpy(void *pvDestination, const void *pvSource, int iSize) {
-    for (int i = 0; i < iSize; i++) {
-        ((char *)pvDestination)[i] = ((char *)pvSource)[i];
+    // for (int i = 0; i < iSize; i++) {
+    //     ((char *)pvDestination)[i] = ((char *)pvSource)[i];
+    // }
+
+    // return iSize;
+
+    int i = 0;
+    for (; i < iSize / 8; i++) {
+        ((QWORD *)pvDestination)[i] = ((QWORD *)pvSource)[i];
     }
 
-    return iSize;
+    int iRemainByteStartOffset = i * 8;
+    for (int i = 0; i < iSize % 8; i++) {
+        ((char *)pvDestination)[iRemainByteStartOffset] = ((char *)pvSource)[iRemainByteStartOffset];
+        iRemainByteStartOffset++;
+    }
 }
 
 int kMemCmp(const void *pvDestination, const void *pvSource, int iSize) {
-    for (int i = 0; i < iSize; i++) {
-        const char cTemp = ((char *)pvDestination)[i] - ((char *)pvSource)[i];
-        if (cTemp != 0) {
-            return (int)cTemp;
+    // for (int i = 0; i < iSize; i++) {
+    //     const char cTemp = ((char *)pvDestination)[i] - ((char *)pvSource)[i];
+    //     if (cTemp != 0) {
+    //         return (int)cTemp;
+    //     }
+    // }
+
+    // return 0;
+
+    int i = 0;
+    for (; i < iSize / 8; i++) {
+        const QWORD qwValue = ((QWORD *)pvDestination)[i] - ((QWORD *)pvSource)[i];
+        if (qwValue != 0) {
+            for (int i = 0; i < 8; i++) {
+                if (((qwValue >> (i * 8)) & 0xff) != 0) {
+                    return (qwValue >> (i * 8)) &0xff;
+                }
+            }
         }
+    }
+
+    int iRemainByteStartOffset = i * 8;
+    for (int i = 0; i < iSize % 8; i++) {
+        char cValue = ((char *)pvDestination)[iRemainByteStartOffset] - ((char *)pvSource)[iRemainByteStartOffset];
+        if (cValue != 0) {
+            return cValue;
+        }
+        iRemainByteStartOffset++;
     }
 
     return 0;
