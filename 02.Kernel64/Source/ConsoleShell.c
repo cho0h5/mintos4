@@ -981,7 +981,7 @@ static void kDeleteFileInRootDirectory(const char *pcParameterBuffer) {
     }
 
     if  (remove(vcFileName) != 0) {
-        kPrintf("File Not Found or File Opened");
+        kPrintf("File Not Found or File Opened\n");
         return;
     }
     kPrintf("File Delete Success\n");
