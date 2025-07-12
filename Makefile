@@ -1,4 +1,4 @@
-all: BootLoader Kernel32 Kernel64 ImageMaker
+all: BootLoader Kernel32 Kernel64 ImageMaker NetworkTransfer
 	make Disk.img
 
 BootLoader:
@@ -14,6 +14,10 @@ ImageMaker:
 	make -C 04.Utility/00.ImageMaker
 	cp 04.Utility/00.ImageMaker/ImageMaker .
 
+NetworkTransfer:
+	make -C 04.Utility/01.NetworkTransfer
+	cp 04.Utility/01.NetworkTransfer/NetworkTransfer .
+
 Disk.img: BootLoader Kernel32
 	./ImageMaker 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin 02.Kernel64/Kernel64.bin
 
@@ -22,8 +26,10 @@ clean:
 	make -C 01.Kernel32 clean
 	make -C 02.Kernel64 clean
 	make -C 04.Utility/00.ImageMaker clean
+	make -C 04.Utility/01.NetworkTransfer clean
 	rm -f Disk.img
 	rm -f ImageMaker
+	rm -f NetworkTransfer
 
 re:
 	make clean

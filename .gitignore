@@ -3,5 +3,6 @@
 *.swp
 *.bin
 *.elf
-ImageMaker
 *.dep
+ImageMaker
+NetworkTransfer
