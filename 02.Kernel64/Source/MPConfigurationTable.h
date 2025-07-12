@@ -15,10 +15,10 @@
 #define MP_PROCESSOR_CPUFLAGS_ENABLE                0x01
 #define MP_PROCESSOR_CPUFLAGS_BSP                   0x02
 
-#define MP_BUS_TYPESCRINT_ISA                       "ISA"
-#define MP_BUS_TYPESCRINT_PCI                       "PCI"
-#define MP_BUS_TYPESCRINT_PCMCIA                    "PCMCIA"
-#define MP_BUS_TYPESCRINT_VESALOCALBUS              "VL"
+#define MP_BUS_TYPESTRING_ISA                       "ISA"
+#define MP_BUS_TYPESTRING_PCI                       "PCI"
+#define MP_BUS_TYPESTRING_PCMCIA                    "PCMCIA"
+#define MP_BUS_TYPESTRING_VESALOCALBUS              "VL"
 
 #define MP_INTERRUPTTYPE_INT                        0
 #define MP_INTERRUPTTYPE_NMI                        1
@@ -41,7 +41,7 @@ typedef struct kMPFloatingPointerStruct {
     BYTE bRevision;
     BYTE bCheckSum;
     BYTE vbMPFeatureByte[5];
-} MPFLOATRINGPOINTER;
+} MPFLOATINGPOINTER;
 
 typedef struct kMPConfigurationTableHeaderStruct {
     char vcSignature[4];
@@ -106,7 +106,7 @@ typedef struct kLocalInterruptEntryStruct {
 #pragma pack(pop)
 
 typedef struct kMPConfigurationManagerStruct {
-    MPFLOATRINGPOINTER *pstMPFloatingPointer;
+    MPFLOATINGPOINTER *pstMPFloatingPointer;
     MPCONFIGURATIONTABLEHEADER *pstMPConfigurationTableHeader;
     QWORD qwBaseEntryStartAddress;
     int iProcessorCount;

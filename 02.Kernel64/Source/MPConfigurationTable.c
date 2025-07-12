@@ -34,7 +34,7 @@ BOOL kFindMPFloatingPointerAddress(QWORD *pstAddress) {
     }
 
     for (char *pcMPFloatingPointer = (char *)0x0f0000;
-            (QWORD)pcMPFloatingPointer < 0x0ffff;
+            (QWORD)pcMPFloatingPointer < 0x0fffff;
             pcMPFloatingPointer++) {
         if (kMemCmp(pcMPFloatingPointer, "_MP_", 4) == 0) {
             kPrintf("MP Floating Pointer is in ROM, [0x%X] Address\n", pcMPFloatingPointer);
@@ -55,7 +55,7 @@ BOOL kAnalysisMPConfigurationTable() {
         return FALSE;
     }
 
-    MPFLOATRINGPOINTER *pstMPFloatingPointer = (MPFLOATRINGPOINTER *)qwMPFloatingPointerAddress;
+    MPFLOATINGPOINTER *pstMPFloatingPointer = (MPFLOATINGPOINTER *)qwMPFloatingPointerAddress;
     gs_stMPConfigurationManager.pstMPFloatingPointer = pstMPFloatingPointer;
     MPCONFIGURATIONTABLEHEADER *pstMPConfigurationHeader =
         (MPCONFIGURATIONTABLEHEADER *)((QWORD)pstMPFloatingPointer->dwMPConfigurationTableAddress &0xffffffff);
@@ -81,7 +81,7 @@ BOOL kAnalysisMPConfigurationTable() {
 
             case MP_ENTRYTYPE_BUS:
                 const BUSENTRY *pstBusEntry = (BUSENTRY *)qwEntryAddress;
-                if (kMemCmp(pstBusEntry->vcBusTypeString, MP_BUS_TYPESCRINT_ISA, kStrLen(MP_BUS_TYPESCRINT_ISA)) == 0) {
+                if (kMemCmp(pstBusEntry->vcBusTypeString, MP_BUS_TYPESTRING_ISA, kStrLen(MP_BUS_TYPESTRING_ISA)) == 0) {
                     gs_stMPConfigurationManager.bISABusID = pstBusEntry->bBusID;
                 }
                 qwEntryAddress += sizeof(BUSENTRY);
@@ -124,7 +124,7 @@ void kPrintMPConfigurationTable() {
     kPrintf("Processor Count: %d\n", pstMPConfigurationManager->iProcessorCount);
     kPrintf("ISA Bus ID: %d\n", pstMPConfigurationManager->bISABusID);
 
-    kPrintf("Press any key to continue... ('q' is exit: ");
+    kPrintf("Press any key to continue... ('q' is exit): ");
     if (kGetCh() == 'q') {
         kPrintf("\n");
         return;
@@ -133,7 +133,7 @@ void kPrintMPConfigurationTable() {
 
     // Print MP Floating Pointer
     kPrintf("========== MP Floating Pointer =========\n");
-    const MPFLOATRINGPOINTER *pstMPFloatingPointer = pstMPConfigurationManager->pstMPFloatingPointer;
+    const MPFLOATINGPOINTER *pstMPFloatingPointer = pstMPConfigurationManager->pstMPFloatingPointer;
     kMemCpy(vcStringBuffer, pstMPFloatingPointer->vcSignature, 4);
     vcStringBuffer[4] = '\0';
     kPrintf("Signature: %s\n", vcStringBuffer);
@@ -176,7 +176,7 @@ void kPrintMPConfigurationTable() {
     kPrintf("Extended Table Length: %d Byte\n", pstMPTableHeader->wExtendedTableLength);
     kPrintf("Extended Table CheckSum: 0x%X\n", pstMPTableHeader->bExtendedTableChecksum);
 
-    kPrintf("Press any key to continue... ('q' is exit: ");
+    kPrintf("Press any key to continue... ('q' is exit): ");
     if (kGetCh() == 'q') {
         kPrintf("\n");
         return;
