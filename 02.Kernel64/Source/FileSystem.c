@@ -201,14 +201,14 @@ static CACHEBUFFER *kAllocateCacheBufferWithFlush(const int iCacheTableIndex) {
     switch(iCacheTableIndex) {
         case CACHE_CLUSTERLINKTABLEAREA:
             if (!kInternalWriteClusterLinkTableWithoutCache(pstCacheBuffer->dwTag, pstCacheBuffer->pbBuffer)) {
-                kPrintf("Cache Buffer Write Failed\n");
+                kPrintf("Cache Buffer Write Failed(LinkTable)\n");
                 return NULL;
             }
             break;
 
         case CACHE_DATAAREA:
             if (!kInternalWriteClusterWithoutCache(pstCacheBuffer->dwTag, pstCacheBuffer->pbBuffer)) {
-                kPrintf("Cache Buffer Write Failed\n");
+                kPrintf("Cache Buffer Write Failed(DataArea)\n");
                 return NULL;
             }
             break;
