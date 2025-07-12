@@ -80,4 +80,7 @@ static void kFlushCache(const char *pcParameterBuffer);
 // SerialPort
 static void kDownloadFile(const char *pcParameterBuffer);
 
+// MP
+static void kShowMPConfigurationTable(const char *pcParameterBuffer);
+
 #endif
