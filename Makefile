@@ -40,7 +40,8 @@ run: re
 		-L . -m 64 -M pc \
 		-drive format=raw,file=Disk.img,if=floppy \
 		-hda HDD.img \
-		-serial tcp::4444,server,nowait
+		-serial tcp::4444,server,nowait \
+		-smp 2
 
 create_hdd:
 	qemu-img create HDD.img 20M
