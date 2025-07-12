@@ -46,7 +46,7 @@ BOOL kInitializeCacheManager() {
 
 CACHEBUFFER *kAllocateCacheBuffer(const int iCacheTableIndex) {
     if (iCacheTableIndex > CACHE_MAXCACHETABLEINDEX) {
-        return FALSE;
+        return NULL;
     }
 
     kCutDownAccessTime(iCacheTableIndex);
@@ -93,7 +93,7 @@ static void kCutDownAccessTime(const int iCacheTableIndex) {
     CACHEBUFFER *pstCacheBuffer = gs_stCacheManager.vvstCacheBuffer[iCacheTableIndex];
     for (int j = 0; j < gs_stCacheManager.vdwMaxCount[iCacheTableIndex] - 1; j++) {
         BOOL bSorted = TRUE;
-        for (int i = 0; i < gs_stCacheManager.vdwMaxCount[iCacheTableIndex] - 1 - j; j++) {
+        for (int i = 0; i < gs_stCacheManager.vdwMaxCount[iCacheTableIndex] - 1 - j; i++) {
             if (pstCacheBuffer[i].dwAccessTime > pstCacheBuffer[i + 1].dwAccessTime) {
                 bSorted = FALSE;
 
@@ -119,7 +119,7 @@ static void kCutDownAccessTime(const int iCacheTableIndex) {
 
 CACHEBUFFER *kGetVictimInCacheBuffer(const int iCacheTableIndex) {
     if (iCacheTableIndex > CACHE_MAXCACHETABLEINDEX) {
-        return FALSE;
+        return NULL;
     }
 
     int iOldIndex = -1;
@@ -158,7 +158,7 @@ void kDiscardAllCacheBuffer(const int iCacheTableIndex) {
 }
 
 BOOL kGetCacheBufferAndCount(const int iCacheTableIndex, CACHEBUFFER **ppstCacheBuffer, int *piMaxCount) {
-    if (iCacheTableIndex > CACHE_MAXDATAAREACOUNT) {
+    if (iCacheTableIndex > CACHE_MAXCACHETABLEINDEX) {
         return FALSE;
     }
 

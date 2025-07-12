@@ -226,7 +226,7 @@ BOOL kWriteClusterLinkTable(const DWORD dwOffset, const BYTE *pbBuffer) {
     if (!gs_stFileSystemManager.bCacheEnable) {
         return kInternalWriteClusterLinkTableWithoutCache(dwOffset, pbBuffer);
     } else {
-        return kInternalWriteClusterLinkTableWithoutCache(dwOffset, pbBuffer);
+        return kInternalWriteClusterLinkTableWithCache(dwOffset, pbBuffer);
     }
 }
 
@@ -296,9 +296,9 @@ static BOOL kInternalReadClusterWithCache(const DWORD dwOffset, BYTE *pbBuffer) 
 
 BOOL kWriteCluster(const DWORD dwOffset, const BYTE *pbBuffer) {
     if (!gs_stFileSystemManager.bCacheEnable) {
-        kInternalWriteClusterWithoutCache(dwOffset, pbBuffer);
+        return kInternalWriteClusterWithoutCache(dwOffset, pbBuffer);
     } else {
-        kInternalWriteClusterWithCache(dwOffset, pbBuffer);
+        return kInternalWriteClusterWithCache(dwOffset, pbBuffer);
     }
 }
 
