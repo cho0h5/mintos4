@@ -29,14 +29,14 @@ BOOL kReadRDDInformation(const BOOL bPrimary, const BOOL bMaster, HDDINFORMATION
 
 int kReadRDDSector(const BOOL bPrimary, const BOOL bMaster, const DWORD dwLBA,
         const int  iSectorCount, char *pcBuffer) {
-    const int iRealReadCount = MIN(gs_stRDDManager.dwTotalSectorCount - dwLBA, iSectorCount);
+    const int iRealReadCount = MIN(gs_stRDDManager.dwTotalSectorCount - (dwLBA + iSectorCount), iSectorCount);
     kMemCpy(pcBuffer, gs_stRDDManager.pbBuffer + (dwLBA * 512), iRealReadCount * 512);
     return iRealReadCount;
 }
 
 int kWriteRDDSector(const BOOL bPrimary, const BOOL bMaster, const DWORD dwLBA,
         const int iSectorCount, const char *pcBuffer) {
-    const int iRealWriteCount = MIN(gs_stRDDManager.dwTotalSectorCount - dwLBA, iSectorCount);
-    kMemCpy(gs_stRDDManager.pbBuffer + (dwLBA * 512), pcBuffer, iRealWriteCount);
+    const int iRealWriteCount = MIN(gs_stRDDManager.dwTotalSectorCount - (dwLBA + iSectorCount), iSectorCount);
+    kMemCpy(gs_stRDDManager.pbBuffer + (dwLBA * 512), pcBuffer, iRealWriteCount * 512);
     return iRealWriteCount;
 }
