@@ -9,6 +9,7 @@ global kReadTSC
 global kSwitchContext, kHlt, kTestAndSet
 global kInitializeFPU, kSaveFPUContext, kLoadFPUContext, kSetTS, kClearTS
 global kInPortWord, kOutPortWord
+global kEnableGlobalLocalAPIC
 
 ; Keyboard
 
@@ -235,3 +236,18 @@ kOutPortWord:
     pop rax
     pop rdx
     ret
+
+kEnableGlobalLocalAPIC:
+    push rax
+    push rcx
+    push rdx
+
+    mov rcx, 27
+    rdmsr
+
+    or eax, 0x0800
+    wrmsr
+
+    pop rdx
+    pop rcx
+    pop rax

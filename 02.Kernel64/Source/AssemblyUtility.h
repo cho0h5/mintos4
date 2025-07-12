@@ -35,4 +35,7 @@ void kClearTS();
 WORD kInPortWord(WORD wPort);
 void kOutPortWord(WORD wPort, WORD wData);
 
+// MP
+void kEnableGlobalLocalAPIC();
+
 #endif
