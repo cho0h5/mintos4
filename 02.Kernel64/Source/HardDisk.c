@@ -211,6 +211,8 @@ int kReadHDDSector(const BOOL bPrimary, const BOOL bMaster, const DWORD dwLBA,
             }
         }
 
+        while ((kReadHDDStatus(bPrimary) & 0x80));
+
         for (int j = 0; j < 512 / 2; j++) {
             ((WORD *)pcBuffer)[lReadCount++] = kInPortWord(wPortBase + HDD_PORT_INDEX_DATA);
         }
@@ -282,6 +284,8 @@ int kWriteHDDSector(const BOOL bPrimary, const BOOL bMaster, const DWORD dwLBA,
     int i = 0;
     for (; i < iSectorCount; i++) {
         kSetHDDInterruptFlag(bPrimary, FALSE);
+
+        while ((kReadHDDStatus(bPrimary) & 0x80));
 
         for (int j = 0; j < 512 / 2; j++) {
             kOutPortWord(wPortBase + HDD_PORT_INDEX_DATA, ((WORD *)pcBuffer)[lReadCount++]);
