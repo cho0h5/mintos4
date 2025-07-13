@@ -34,8 +34,8 @@ NASM version 2.16.03 compiled on May 13 2025
 - ch25. `Main`에서 `FileSystem`를 초기화하면 `HDD`를 더이상 초기화 할 필요 없음
 - ch26. 1082쪽 `kOpenDirectory`구현의 두번째 if에서 `pstDirectory`가 아니라 `pstDirectoryBuffer`를 NULL검사 해야함
 - ch26. `FileSystem.h`에서 `size_t`를 정의하면 컴파일 에러 발생하여 정의하지 않음
-- ch26. 저자 코드도 `testfileio`에서 `Interrupt Not Occur`가 종종 발생하고 일부 테스트케이스에서 Fail 발생함
 - ch26. `kWriteHDDSector`, `kReadHDDSector`에서 `kOutPortWord`, `kInPortWord`하기 전에 `HDD_STATUS_BUSY`인지도 확인하고 해야함
+    - 저자 코드대로만 작성하면 `testfileio`에서 `Interrupt Not Occur`가 종종 발생하고 일부 테스트케이스에서 Fail 발생함
 
 ### TODO
 - ch27. 버블소트를 퀵소트로 교체하기
