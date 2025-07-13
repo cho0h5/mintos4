@@ -11,7 +11,7 @@ QWORD kGetIOAPICBaseAddressOfISA() {
 
     if (gs_stIOAPICManager.qwIOAPICBaseAddressOfISA == NULL) {
         const IOAPICENTRY *pstIOAPICEntry = kFindIOAPICEntryForISA();
-        if (pstIOAPICEntry == NULL) {
+        if (pstIOAPICEntry != NULL) {
             gs_stIOAPICManager.qwIOAPICBaseAddressOfISA = pstIOAPICEntry->dwMemoryMapAddress & 0xffffffff;
         }
     }
