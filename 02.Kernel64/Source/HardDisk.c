@@ -211,7 +211,10 @@ int kReadHDDSector(const BOOL bPrimary, const BOOL bMaster, const DWORD dwLBA,
             }
         }
 
-        while ((kReadHDDStatus(bPrimary) & 0x80));
+        // Should wait for no busy before reading from disk
+        if (!kWaitForHDDNoBusy(bPrimary)) {
+            return FALSE;
+        }
 
         for (int j = 0; j < 512 / 2; j++) {
             ((WORD *)pcBuffer)[lReadCount++] = kInPortWord(wPortBase + HDD_PORT_INDEX_DATA);
@@ -285,7 +288,10 @@ int kWriteHDDSector(const BOOL bPrimary, const BOOL bMaster, const DWORD dwLBA,
     for (; i < iSectorCount; i++) {
         kSetHDDInterruptFlag(bPrimary, FALSE);
 
-        while ((kReadHDDStatus(bPrimary) & 0x80));
+        // Should wait for no busy before writing to disk
+        if (!kWaitForHDDNoBusy(bPrimary)) {
+            return FALSE;
+        }
 
         for (int j = 0; j < 512 / 2; j++) {
             kOutPortWord(wPortBase + HDD_PORT_INDEX_DATA, ((WORD *)pcBuffer)[lReadCount++]);
