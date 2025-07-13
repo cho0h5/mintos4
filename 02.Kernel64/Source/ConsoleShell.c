@@ -12,6 +12,7 @@
 #include "FileSystem.h"
 #include "SerialPort.h"
 #include "MPConfigurationTable.h"
+#include "MultiProcessor.h"
 
 SHELLCOMMANENTRY gs_vstCommandTable[] = {
     {"help", "Show help", kHelp},
@@ -53,6 +54,7 @@ SHELLCOMMANENTRY gs_vstCommandTable[] = {
     {"flush", "Flush File System Cache", kFlushCache},
     {"download", "Download Data From Serial. Usage: download a.txt", kDownloadFile},
     {"showmpinfo", "Show MP Configuration Table Information", kShowMPConfigurationTable},
+    {"startap", "Start Application Processor", kStartApplicationProcessor},
 };
 
 void kStartConsoleShell() {
@@ -1536,4 +1538,14 @@ static void kDownloadFile(const char *pcParameterBuffer) {
 
 static void kShowMPConfigurationTable(const char *pcParameterBuffer) {
     kPrintMPConfigurationTable();
+}
+
+static void kStartApplicationProcessor(const char *pcParameterBuffer) {
+    if (!kStartUpApplicationProcessor()) {
+        kPrintf("Application Processor Start Fail\n");
+        return;
+    }
+    kPrintf("Application Processor Start Success\n");
+
+    kPrintf("Bootstrap Processor[APIC ID: %d] Start Application Processor\n", kGetAPICID());
 }
