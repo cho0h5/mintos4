@@ -280,3 +280,63 @@ void kPrintMPConfigurationTable() {
         }
     }
 }
+
+IOAPICENTRY *kFindIOAPICEntryForISA() {
+    MPCONFIGURATIONTABLEHEADER *pstMPHeader = gs_stMPConfigurationManager.pstMPConfigurationTableHeader;
+    QWORD qwEntryAddress = gs_stMPConfigurationManager.qwBaseEntryStartAddress;
+    IOINTERRUPTASSIGNMENTENTRY *pstIOAssignmentEntry;
+
+    BOOL bFind = FALSE;
+    for (int i = 0; i < pstMPHeader->wEntryCount && !bFind; i++) {
+        const BYTE bEntryType = *(BYTE *)qwEntryAddress;
+        switch (bEntryType) {
+            case MP_ENTRYTYPE_PROCESSOR:
+                qwEntryAddress += sizeof(PROCESSORENTRY);
+                break;
+
+            case MP_ENTRYTYPE_BUS:
+            case MP_ENTRYTYPE_IOAPIC:
+            case MP_ENTRYTYPE_LOCALINTERRUPTASSIGNMENT:
+                qwEntryAddress += 8;
+                break;
+
+            case MP_ENTRYTYPE_IOINTERRUPTASSIGNMENT:
+                pstIOAssignmentEntry = (IOINTERRUPTASSIGNMENTENTRY *)qwEntryAddress;
+                if (pstIOAssignmentEntry->bSourceBUSID == gs_stMPConfigurationManager.bISABusID) {
+                    bFind = TRUE;
+                }
+                qwEntryAddress += sizeof(IOINTERRUPTASSIGNMENTENTRY);
+                break;
+        }
+    }
+
+    if (!bFind) {
+        return NULL;
+    }
+
+    qwEntryAddress = gs_stMPConfigurationManager.qwBaseEntryStartAddress;
+    for (int i = 0; i < pstMPHeader->wEntryCount; i++) {
+        const BYTE bEntryType = *(BYTE *)qwEntryAddress;
+        switch (bEntryType) {
+            case MP_ENTRYTYPE_PROCESSOR:
+                qwEntryAddress += sizeof(PROCESSORENTRY);
+                break;
+
+            case MP_ENTRYTYPE_BUS:
+            case MP_ENTRYTYPE_IOINTERRUPTASSIGNMENT:
+            case MP_ENTRYTYPE_LOCALINTERRUPTASSIGNMENT:
+                qwEntryAddress += 8;
+                break;
+
+            case MP_ENTRYTYPE_IOAPIC:
+                IOAPICENTRY *pstIOAPICEntry = (IOAPICENTRY *)qwEntryAddress;
+                if (pstIOAPICEntry->bIOAPICID == pstIOAssignmentEntry->bDestinationIOAPICID) {
+                    return pstIOAPICEntry;
+                }
+                qwEntryAddress += sizeof(IOINTERRUPTASSIGNMENTENTRY);
+                break;
+        }
+    }
+
+    return NULL;
+}

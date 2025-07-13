@@ -2,6 +2,7 @@
 #define __MPCONFIGURATIONTABLE_H__
 
 #include "Types.h"
+#include "IOAPIC.h"
 
 #define MP_FLOATINGPOINTER_FEATUREBYTE1_USEMPTABLE  0x00
 #define MP_FLOATINGPOINTER_FEATUREBYTE2_PICMODE     0x80
@@ -118,5 +119,6 @@ BOOL kFindMPFloatingPointerAddress(QWORD *pstAddress);
 BOOL kAnalysisMPConfigurationTable();
 MPCONFIGURATIONMANAGER *kGetMPConfigurationManager();
 void kPrintMPConfigurationTable();
+IOAPICENTRY *kFindIOAPICEntryForISA();
 
 #endif
