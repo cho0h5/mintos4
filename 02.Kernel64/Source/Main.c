@@ -13,6 +13,7 @@
 #include "FileSystem.h"
 #include "SerialPort.h"
 #include "MultiProcessor.h"
+#include "LocalAPIC.h"
 
 void MainForApplicationProcessor();
 
@@ -112,6 +113,12 @@ void MainForApplicationProcessor() {
 
     // IDT
     kLoadIDTR(IDTR_STARTADDRESS);
+
+    // Interrupt
+    kEnableSoftwareLocalAPIC();
+    kSetTaskPriority(0);
+    kInitializeLocalVectorTable();
+    kEnableInterrupt();
 
     // Print
     QWORD qwTickCount = kGetTickCount();
