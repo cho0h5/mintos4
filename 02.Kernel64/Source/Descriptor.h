@@ -2,6 +2,7 @@
 #define __DESCRIPTOR_H__
 
 #include "Types.h"
+#include "MultiProcessor.h"
 
 // GDT
 #define GDT_TYPE_CODE               0x0a
@@ -33,9 +34,9 @@
 
 #define GDTR_STARTADDRESS           0x142000
 #define GDT_MAXENTRY8COUNT          3
-#define GDT_MAXENTRY16COUNT         1
-#define GDT_TABLESIZE               sizeof(GDTENTRY8) * GDT_MAXENTRY8COUNT + sizeof(GDTENTRY16) * GDT_MAXENTRY16COUNT
-#define TSS_SEGMENTSIZE             (sizeof(TSSSEGMENT))
+#define GDT_MAXENTRY16COUNT         (MAXPROCESSORCOUNT)
+#define GDT_TABLESIZE               (sizeof(GDTENTRY8) * GDT_MAXENTRY8COUNT + sizeof(GDTENTRY16) * GDT_MAXENTRY16COUNT)
+#define TSS_SEGMENTSIZE             (sizeof(TSSSEGMENT) * MAXPROCESSORCOUNT)
 
 // IDT
 #define IDT_TYPE_INTERRUPT          0x0e
@@ -53,6 +54,8 @@
 
 #define IDT_MAXENTRYCOUNT           100
 #define IDTR_STARTADDRESS           (GDTR_STARTADDRESS + sizeof(GDTR) + GDT_TABLESIZE + TSS_SEGMENTSIZE)
+#define IDT_STARTADDRESS            (IDTR_STARTADDRESS + sizeof(IDTR))
+#define IDT_TABLESIZE               (IDT_MAXENTRYCOUNT * sizeof(IDTENTRY));
 
 // IST
 #define IST_STARTADDRESS            0x700000

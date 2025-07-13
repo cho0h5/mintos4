@@ -1,12 +1,12 @@
 #include "LocalAPIC.h"
 #include "MPConfigurationTable.h"
 
-QWORD kGetLocalAPIBaseAddress() {
+QWORD kGetLocalAPICBaseAddress() {
     MPCONFIGURATIONTABLEHEADER *pstMPHeader = kGetMPConfigurationManager()->pstMPConfigurationTableHeader;
     return pstMPHeader->dwMemoryMapIOAddressOfLocalAPIC;
 }
 
 void kEnableSoftwareLocalAPIC() {
-    QWORD qwLocalAPIBaseAddress = kGetLocalAPIBaseAddress();
-    *(DWORD *)(qwLocalAPIBaseAddress + APIC_REGISTER_SVR) |= 0x100;
+    QWORD qwLocalAPICBaseAddress = kGetLocalAPICBaseAddress();
+    *(DWORD *)(qwLocalAPICBaseAddress + APIC_REGISTER_SVR) |= 0x100;
 }

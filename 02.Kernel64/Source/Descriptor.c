@@ -2,13 +2,14 @@
 #include "Descriptor.h"
 #include "Utility.h"
 #include "ISR.h"
+#include "MultiProcessor.h"
 
 // GDT
 
 void kInitializeGDTTableAndTSS() {
     // GDTR
-    GDTR *pstGDTR = (GDTR *)0x142000;
-    GDTENTRY8 *pstEntry = (GDTENTRY8 *)(0x142000 + sizeof(GDTR));
+    GDTR *pstGDTR = (GDTR *)GDTR_STARTADDRESS;
+    GDTENTRY8 *pstEntry = (GDTENTRY8 *)(GDTR_STARTADDRESS + sizeof(GDTR));
     pstGDTR->wLimit = GDT_TABLESIZE - 1;
     pstGDTR->qwBaseAddress = (QWORD)pstEntry;
     TSSSEGMENT *pstTSS = (TSSSEGMENT *)((QWORD)pstEntry + GDT_TABLESIZE);
@@ -23,8 +24,11 @@ void kInitializeGDTTableAndTSS() {
     kSetGDTEntry8(&pstEntry[2], 0, 0xFFFFF, GDT_FLAGS_UPPER_DATA, GDT_FLAGS_LOWER_KERNELDATA, GDT_TYPE_DATA);
 
     // TSS Descriptor
-    kSetGDTEntry16((GDTENTRY16 *)&pstEntry[3], (QWORD)pstTSS, sizeof(TSSSEGMENT) - 1,
-            GDT_FLAGS_UPPER_TSS, GDT_FLAGS_LOWER_TSS, GDT_TYPE_TSS);
+    for (int i = 0; i < MAXPROCESSORCOUNT; i++) {
+        kSetGDTEntry16((GDTENTRY16 *)&pstEntry[GDT_MAXENTRY8COUNT + i * 2],
+                (QWORD)pstTSS + i * sizeof(TSSSEGMENT), sizeof(TSSSEGMENT) - 1,
+                GDT_FLAGS_UPPER_TSS, GDT_FLAGS_LOWER_TSS, GDT_TYPE_TSS);
+    }
 
     kInitializeTSSSegment(pstTSS);
 }
@@ -52,18 +56,21 @@ void kSetGDTEntry16(GDTENTRY16 *pstEntry, QWORD qwBaseAddress, DWORD dwLimit,
 }
 
 void kInitializeTSSSegment(TSSSEGMENT *pstTSS) {
-    kMemSet(pstTSS, 0, sizeof(TSSSEGMENT));
-    pstTSS->qwIST[0] = IST_STARTADDRESS + IST_SIZE;
-    pstTSS->wIOMapBaseAddress = 0xffff;
+    for (int i = 0; i < MAXPROCESSORCOUNT; i++) {
+        kMemSet(pstTSS, 0, sizeof(TSSSEGMENT));
+        pstTSS->qwIST[0] = IST_STARTADDRESS + IST_SIZE - (IST_SIZE / MAXPROCESSORCOUNT * i);
+        pstTSS->wIOMapBaseAddress = 0xffff;
+        pstTSS++;
+    }
 }
 
 // IDT
 
 void kInitializeIDTTables() {
-    IDTR *pstIDTR = (IDTR *)0x1420a0;
-    IDTENTRY *pstEntry = (IDTENTRY *)(0x1420a0 + sizeof(IDTR));
+    IDTR *pstIDTR = (IDTR *)IDTR_STARTADDRESS;
+    IDTENTRY *pstEntry = (IDTENTRY *)(IDTR_STARTADDRESS + sizeof(IDTR));
     pstIDTR->qwBaseAddress = (QWORD)pstEntry;
-    pstIDTR->wLimit = 100 * sizeof(IDTENTRY) - 1;
+    pstIDTR->wLimit = IDT_TABLESIZE - 1;
 
     // Exception
     kSetIDTEntry(&pstEntry[0], kISRDivideError, 0x08, IDT_FLAGS_IST1, IDT_FLAGS_KERNEL, IDT_TYPE_INTERRUPT);

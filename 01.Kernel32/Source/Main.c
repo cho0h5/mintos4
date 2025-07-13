@@ -2,12 +2,19 @@
 #include "Page.h"
 #include "ModeSwitch.h"
 
+#define BOOTSTRAPPROCESSOR_FLAGADDRESS 0x7c09
+
 void kPrintString(const int iX, const int iY, const char *pcString);
 BOOL kInitializeKernel64Area();
 BOOL kIsMemoryEnough();
 void kCopyKernel64ImageTo2Mbyte();
 
 void Main() {
+    if (*((BYTE *)BOOTSTRAPPROCESSOR_FLAGADDRESS) == 0) {
+        kSwitchAndExecute64bitKernel();
+        while (1) ;
+    }
+
     kPrintString(0, 3, "[Pass] C Lang Kernel Started");
 
     kPrintString(0, 4, "[    ] Minimum Memory Size Check");

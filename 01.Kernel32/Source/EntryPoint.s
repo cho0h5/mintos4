@@ -30,12 +30,16 @@ PROTECTEDMODE:
     mov esp, 0xFFFE
     mov ebp, 0xFFFE
 
+    cmp byte [0x7c09], 0x00
+    je .APPLICATIONPROCESSORSTARTPOINT
+
     push (SWITCHSUCCESSMESSAGE - $$ + 0x10000)
     push 2
     push 0
     call PRINTMESSAGE
     add esp, 12
 
+.APPLICATIONPROCESSORSTARTPOINT
     jmp dword 0x18: 0x10200
 
 PRINTMESSAGE:

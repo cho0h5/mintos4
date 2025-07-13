@@ -72,3 +72,17 @@ static BOOL kWakeUpApplicationProcessor() {
 
     return TRUE;
 }
+
+BYTE kGetAPICID() {
+    if (g_qwAPICIDAddress == 0) {
+        const MPCONFIGURATIONTABLEHEADER *pstMPHeader = kGetMPConfigurationManager()->pstMPConfigurationTableHeader;
+        if (pstMPHeader == NULL) {
+            return 0;
+        }
+
+        const QWORD qwLocalAPICBaseAddress =pstMPHeader->dwMemoryMapIOAddressOfLocalAPIC;
+        g_qwAPICIDAddress = qwLocalAPICBaseAddress + APIC_REGISTER_APICID;
+    }
+
+    return *((DWORD *)g_qwAPICIDAddress) >> 24;
+}
