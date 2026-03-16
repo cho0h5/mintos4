@@ -38,6 +38,9 @@ NASM version 2.16.03 compiled on May 13 2025
     - 저자 코드대로만 작성하면 `testfileio`에서 `Interrupt Not Occur`가 종종 발생하고 일부 테스트케이스에서 Fail 발생함
 
 ### TODO
+- `testseqalloc`: 테스트 중간에 할당 실패하면 그 동안 할당한 메모리를 해제하지 않음
+- `testseqalloc`: 동적할당이 하나도 안되어있는 상황을 가정하고 테스트가 작성되어있음. 이후에 file system을 부팅 과정에서 초기화하는 중 동적할당하는 부분이 추가되면서 `testseqalloc`이 실패하게 됨
+- `testranalloc`: 메모리를 전부 사용하고있을 때 메모리를 할당할 수 있을 때까지 stuck됨
 - ch27. 버블소트를 퀵소트로 교체하기
 - Rust로 High level부터 교체하기
     - 더 확실하게 개념 이해하고
