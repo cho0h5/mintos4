@@ -44,3 +44,15 @@ NASM version 2.16.03 compiled on May 13 2025
     - 못 고친 부분 찾고
     - 코드 가독성, 성능 개선하기
     - ConsoleShell -> Cache -> FileSystem -> HardDisk -> ...
+
+### Env
+
+```sh
+docker run -it -v .:/root/mintos --name builder ubuntu /bin/bash
+```
+
+```sh
+docker exec -it builder bash
+apt update
+apt install build-essential nasm gcc-x86-64-linux-gnu qemu-utils qemu-system-x86
+```

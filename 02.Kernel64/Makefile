@@ -1,7 +1,7 @@
 NASM64 = nasm -f elf64
 GCC64 = x86_64-linux-gnu-gcc -c -m64 -ffreestanding -fno-stack-protector
-LD64 = ld -melf_x86_64 -T ../elf_x86_64.x -nostdlib -e Main -Ttext 0x200000
-OBJCOPY64 = objcopy -j .text -j .data -j .rodata -j .bss -S -O binary
+LD64 = x86_64-linux-gnu-ld -melf_x86_64 -T ../elf_x86_64.x -nostdlib -e Main -Ttext 0x200000
+OBJCOPY64 = x86_64-linux-gnu-objcopy -j .text -j .data -j .rodata -j .bss -S -O binary
 
 OBJECTDIRECTORY = Temp
 SOURCEDIRECTORY = Source
