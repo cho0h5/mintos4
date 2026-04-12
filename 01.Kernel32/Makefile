@@ -1,58 +1,34 @@
 NASM32 = nasm
-GCC32 = x86_64-linux-gnu-gcc -c -m32 -ffreestanding
-LD32 = x86_64-linux-gnu-ld -melf_i386 -T ../elf_i386.x -nostdlib -e Main -Ttext 0x10200
+GCC32 = x86_64-linux-gnu-gcc -c -m32 -ffreestanding -MMD -MP
+LD32 = x86_64-linux-gnu-ld -melf_i386 -T elf_i386.x -nostdlib -e Main -Ttext 0x10200
 OBJCOPY32 = x86_64-linux-gnu-objcopy -j .text -j .data -j .rodata -j .bss -S -O binary
 
-OBJECTDIRECTORY = Temp
-SOURCEDIRECTORY = Source
+CSOURCEFILES = $(wildcard *.c)
+ASMSOURCEFILES = $(wildcard *.asm)
+COBJECTFILES = $(patsubst %.c, %.o, $(CSOURCEFILES))
+ASSEMBLYOBJECTFILES = $(patsubst %.asm, %.o, $(ASMSOURCEFILES))
 
-all:
-	make prepare
-	make Kernel32.bin
+all: Kernel32.bin
 
-prepare:
-	mkdir -p $(OBJECTDIRECTORY)
-
-$(OBJECTDIRECTORY)/EntryPoint.bin: $(SOURCEDIRECTORY)/EntryPoint.s
+EntryPoint.bin: EntryPoint.s
 	$(NASM32) -o $@ $<
 
-dep:
-	make -C $(OBJECTDIRECTORY) -f ../Makefile Kernel32.elf
+Kernel32.elf.bin: Kernel32.elf
+	$(OBJCOPY32) $< $@
 
-ExecuteInternalBuild: dep
-	make -C $(OBJECTDIRECTORY) -f ../Makefile Kernel32.elf
-
-$(OBJECTDIRECTORY)/Kernel32.elf.bin: ExecuteInternalBuild
-	$(OBJCOPY32) $(OBJECTDIRECTORY)/Kernel32.elf $@
-
-Kernel32.bin: $(OBJECTDIRECTORY)/EntryPoint.bin $(OBJECTDIRECTORY)/Kernel32.elf.bin
+Kernel32.bin: EntryPoint.bin Kernel32.elf.bin
 	cat $^ > $@
 
 clean:
-	rm -f *.bin
-	rm -rf $(OBJECTDIRECTORY)
+	rm -f *.bin *.elf *.o *.d
 
-########
+%.o: %.c
+	$(GCC32) -o $@ $<
 
-CENTRYPOINTOBJECTFILE = Main.o
-CSOURCEFILES = $(wildcard ../$(SOURCEDIRECTORY)/*.c)
-ASSEMBLYSOURCEFILES = $(wildcard ../$(SOURCEDIRECTORY)/*.asm)
-COBJECTFILES = $(subst Main.o, , $(notdir $(patsubst %.c, %.o, $(CSOURCEFILES))))
-ASSEMBLYOBJECTFILES = $(notdir $(patsubst %.asm, %.o, $(ASSEMBLYSOURCEFILES)))
-
-%.o: ../$(SOURCEDIRECTORY)/%.c
-	$(GCC32) -c $<
-
-%.o: ../$(SOURCEDIRECTORY)/%.asm
+%.o: %.asm
 	$(NASM32) -f elf32 -o $@ $<
 
-InternalDependency:
-	$(GCC32) -MM $(CSOURCEFILES) > Dependency.dep
-
-Kernel32.elf: $(CENTRYPOINTOBJECTFILE) $(COBJECTFILES) $(ASSEMBLYOBJECTFILES)
+Kernel32.elf: Main.o $(filter-out Main.o, $(COBJECTFILES)) $(ASSEMBLYOBJECTFILES)
 	$(LD32) -o $@ $^
 
-ifeq (Dependency.dep, $(wildcard Dependency.dep))
-include Dependency.dep
-endif
-
+-include $(COBJECTFILES:.o=.d)
