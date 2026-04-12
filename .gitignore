@@ -1,5 +1,6 @@
 *.img
 *.o
+*.d
 *.swp
 *.bin
 *.elf
