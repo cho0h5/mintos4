@@ -1,3 +1,5 @@
+.PHONY: all BootLoader Kernel32 Kernel64 ImageMaker NetworkTransfer clean re run run-on-mac qemu create_hdd
+
 all: Disk.img NetworkTransfer
 
 BootLoader:
