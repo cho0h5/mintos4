@@ -44,5 +44,15 @@ run: re
 		-smp 4 \
 		-display curses	# Press ALT + 2 or ESC + 2, then enter quit
 
+run-on-mac:
+	docker exec builder sh -c "cd /root/mintos && make"
+	qemu-system-x86_64 \
+		-L . -m 64 -M pc \
+		-drive format=raw,file=Disk.img,if=floppy \
+		-hda HDD.img \
+		-serial tcp::4444,server,nowait \
+		-smp 4 \
+		-display curses	# Press ALT + 2 or ESC + 2, then enter quit
+
 create_hdd:
 	qemu-img create HDD.img 20M
