@@ -37,12 +37,19 @@ NASM version 2.16.03 compiled on May 13 2025
 - ch26. `kWriteHDDSector`, `kReadHDDSector`에서 `kOutPortWord`, `kInPortWord`하기 전에 `HDD_STATUS_BUSY`인지도 확인하고 해야함
     - 저자 코드대로만 작성하면 `testfileio`에서 `Interrupt Not Occur`가 종종 발생하고 일부 테스트케이스에서 Fail 발생함
 
+### Rust 재작성 시 겪은 문제들
+
+#### Queue 재작성 (2026-04-12)
+- `%` 연산자 사용 시 링커 에러 (`panic_const_rem_by_zero` 심볼 없음)
+- `copy_nonoverlapping` 사용 시 키보드 입력할 때 Vector 06 (`#UD`) 예외 발생
+- `-C relocation-model=static` 없이 빌드 시 키보드 입력할 때 Vector 06 (`#UD`) 예외 발생
+
 ### TODO
 - `testseqalloc`: 테스트 중간에 할당 실패하면 그 동안 할당한 메모리를 해제하지 않음
 - `testseqalloc`: 동적할당이 하나도 안되어있는 상황을 가정하고 테스트가 작성되어있음. 이후에 file system을 부팅 과정에서 초기화하는 중 동적할당하는 부분이 추가되면서 `testseqalloc`이 실패하게 됨
 - `testranalloc`: 메모리를 전부 사용하고있을 때 메모리를 할당할 수 있을 때까지 stuck됨
 - ch27. 버블소트를 퀵소트로 교체하기
-- Rust로 High level부터 교체하기
+- Rust로 High level부터 재작성하기
     - 더 확실하게 개념 이해하고
     - 못 고친 부분 찾고
     - 코드 가독성, 성능 개선하기

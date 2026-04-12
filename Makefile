@@ -44,7 +44,7 @@ qemu:
 run: all qemu
 
 run-on-mac:
-	docker exec builder sh -c "cd /root/mintos && make"
+	docker exec -t builder bash -i -c "cd /root/mintos && make"
 	make qemu
 
 create_hdd:
